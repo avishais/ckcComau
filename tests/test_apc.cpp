@@ -4,8 +4,7 @@
 #include <stdlib.h>
 #include <fstream>
 
-#define ROBOTS_DISTANCE 4000
-#define ROD_LENGTH 500
+#include "../proj_classes/def.h"
 
 double fRand(double fMin, double fMax)
 {
@@ -28,14 +27,15 @@ int main() {
 	cout << "Seed in testing: " << Seed << endl;
 
 	// APC
-	two_robots A({-ROBOTS_DISTANCE/2, 0, 0, 0 }, {ROBOTS_DISTANCE/2, 0, 0, PI_}, ROD_LENGTH);
+	two_robots A;
 
-	// State q(6,1);
-	// q = {0.3, -0.5, 0.5, 0, 0.4, 0};
-	// //q[4] = 1;
-	// A.printVector(q);
+	// State q1(6,0);
+	// State q2(6,0);
+	// // q = {0.3, -0.5, 0.5, 0, 0.4, 0};
+	// q2[0] = 1.5707;
+	// A.printVector(q2);
 
-	// A.FKsolve_rob(q, 2);
+	// A.FKsolve_rob(q2, 2);
 	// Matrix T = A.get_FK_solution_T2();
 	// A.printMatrix(T);
 
@@ -46,9 +46,9 @@ int main() {
 	// }
 
 	Matrix Q;
-	Q.push_back({1, 0, 0, ROD_LENGTH});
+	Q.push_back({0, 0, -1, 435/2});
 	Q.push_back({0, 1, 0, 0});
-	Q.push_back({0, 0, 1, 0});
+	Q.push_back({1, 0, 0, 300+450});
 	Q.push_back({0, 0, 0, 1});
 
 	State q(12);// = {-0.262098, 1.25857, -1.81284, -3.13239, -0.0252604, 1.13626, -1.7244, -1.04968, -0.715249, 1.57762, 2.10969, 2.22163};
@@ -56,8 +56,12 @@ int main() {
 	while (1) {
 		// Random active chain
 		for (int i = 0; i < 6; i++)
-			q1[i] = 0;//fRand(-3.14, 3.14);
-		//q1 = {2.95755, -1.57497, -1.56365, 1.01619, 0.0953593, -2.15862};
+			q1[i] = fRand(-3.14, 3.14);
+		q1 = {-0.15, 0.33, -0.05, 0, 1.2908, -1.7208};
+		//A.FKsolve_rob(q1, 1);
+		//A.printMatrix(A.get_FK_solution_T1());
+		//cin.ignore();
+
 		int ik_sol = rand() % 8;
 		
 
@@ -75,14 +79,7 @@ int main() {
 		//if (A.check_angle_limits(q))
 			break;
 	}
-
-	
-
-	A.printVector(q1);
-
-	
-
-	
+	A.printVector(q1);	
 	
 	A.log_q(q);
 

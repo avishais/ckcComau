@@ -34,7 +34,6 @@ public:
 	/** Constructors */
 	StateValidityChecker(const ob::SpaceInformationPtr &si, int env = 1) :
 		mysi_(si.get()),
-		two_robots({-(env==1 ? ROBOTS_DISTANCE_ENV_I : ROBOTS_DISTANCE_ENV_II)/2, 0, 0, 0}, {(env==1 ? ROBOTS_DISTANCE_ENV_I : ROBOTS_DISTANCE_ENV_II)/2, 0, 0, PI_}, env==1 ? ROD_LENGTH_ENV_I : ROD_LENGTH_ENV_II),
 		collisionDetection(env==1 ? ROBOTS_DISTANCE_ENV_I : ROBOTS_DISTANCE_ENV_II,0,0,0,env)
 			{L = env==1 ? ROD_LENGTH_ENV_I : ROD_LENGTH_ENV_II;
 			q_temp.resize(6);
@@ -42,7 +41,6 @@ public:
 			setP();
 			}; //Constructor
 	StateValidityChecker(int env = 1) :
-		two_robots({-(env==1 ? ROBOTS_DISTANCE_ENV_I : ROBOTS_DISTANCE_ENV_II)/2, 0, 0, 0 }, {(env==1 ? ROBOTS_DISTANCE_ENV_I : ROBOTS_DISTANCE_ENV_II)/2, 0, 0, PI_}, env==1 ? ROD_LENGTH_ENV_I : ROD_LENGTH_ENV_II),
 		collisionDetection(env==1 ? ROBOTS_DISTANCE_ENV_I : ROBOTS_DISTANCE_ENV_II,0,0,0,env)
 			{L = env==1 ? ROD_LENGTH_ENV_I : ROD_LENGTH_ENV_II;
 			q_temp.resize(6);

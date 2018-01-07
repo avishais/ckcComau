@@ -10,14 +10,14 @@
 #include <unistd.h>
 #include <string.h>
 
-#define ROBOTS_DISTANCE 4000
-#define ROBOTS_DISTANCE_ENVII 1200
-#define ROD_LENGTH 500
-#define ROD_LENGTH_ENVII 500
+#include "../proj_classes/def.h"
 
-PQP_Model base, link1, link2, link3, link4, link5, link6, EE, table, room, floor1;
+#define ROBOT_COLOR 0.9020, 0.6078, 0.1490
+
+
+PQP_Model base, link1, link2, link3, link4, link5, link6, EE, table, room, floor1, chassis, box, conveyor, b1, b2;
 Model *base_to_draw, *link1_to_draw, *link2_to_draw, *link3_to_draw, \
-*link4_to_draw, *link5_to_draw, *link6_to_draw, *EE_to_draw;
+*link4_to_draw, *link5_to_draw, *link6_to_draw, *EE_to_draw, *chassis_to_draw, *conveyor_to_draw, *b1_to_draw, *b2_to_draw, *box_to_draw;
 
 PQP_Model base2, link12, link22, link32, link42, link52, link62, EE2, rod, obs1, obs2, obs3;
 Model *base_to_draw2, *link1_to_draw2, *link2_to_draw2, *link3_to_draw2, \
@@ -27,14 +27,14 @@ Model *base_to_draw2, *link1_to_draw2, *link2_to_draw2, *link3_to_draw2, \
 
 PQP_REAL R0[3][3],R1[3][3],R2[3][3],T0[3],T1[3],T2[3];
 PQP_REAL R3[3][3],R4[3][3],R5[3][3],T3[3],T4[3],T5[5];
-PQP_REAL R6[3][3],R7[3][3],T6[3],T7[3],T2_t[3],Ti[3], Tt[3];
+PQP_REAL R6[3][3],R7[3][3],Rbox[3][3],T6[3],T7[3],T2_t[3],Ti[3], Tt[3];
 
 PQP_REAL M0[3][3],M1[3][3],M2[3][3],M3[3][3],M4[3][3];
-PQP_REAL M5[3][3],M6[3][3],M7[3][3];
+PQP_REAL M5[3][3],M6[3][3],M7[3][3],Mbox[3][3];
 
 PQP_REAL Mobs[3][3], Tobs[3];
 
-bool withObs = false;
+bool withObs = true;
 int env;
 
 int step;
@@ -68,7 +68,7 @@ double rot12 = 0.0, rot22 = 0.0, rot32 = 0.0;  //in radians
 double rot42 = 0.0, rot52 = 0.0, rot62 = 0.0;
 int visualizeRobots = 1, visualize = 1;
 //double offsetX=1092.1, offsetY=3.4, offsetZ=0.1, offsetRot=0.064270;
-double offsetX=ROBOTS_DISTANCE, offsetY=0, offsetZ=0, offsetRot=0;
+double offsetX=ROBOTS_DISTANCE_X, offsetY=ROBOTS_DISTANCE_Y, offsetZ=0, offsetRot=ROBOT2_ROT;
 
 void pm(const PQP_REAL M[][3], std::string str) {
 	std::cout << str << std::endl;
@@ -271,19 +271,19 @@ void DisplayCB()
 	MRotX(M6,rot6);  //link 6 rotate X
 	MxM(R6,R5,M6);
 
-	MRotY(M7,3.1415926/2);
+	MRotY(M7,0);
 	MxM(R7,R6,M7);
 
 	//define kinematics
 
 	T0[0] =  -offsetX/2;
-	T0[1] =  offsetY/2;
-	T0[2] =  offsetZ/2;
+	T0[1] =  0;
+	T0[2] =  ROBOT1_HEIGHT;
 
 	MxV(T0,R0,T0);
 
 	if (visualizeRobots == 1){
-		glColor3d(0.5,0.5,0.5);
+		glColor3d(ROBOT_COLOR);
 		MVtoOGL(oglm,R0,T0);
 		glPushMatrix();
 		glMultMatrixd(oglm);
@@ -299,7 +299,7 @@ void DisplayCB()
 	VpV(T1,T0,Tt);
 
 	if(visualizeRobots == 1){
-		glColor3d(0.5,0.5,0.5);
+		glColor3d(ROBOT_COLOR);
 		MVtoOGL(oglm,R1,T1);
 		glPushMatrix();
 		glMultMatrixd(oglm);
@@ -307,7 +307,7 @@ void DisplayCB()
 		glPopMatrix();
 	}
 
-	T2[0] =  400+125;//??
+	T2[0] =  524.5;
 	T2[1] =  -183.5;
 	T2[2] =  199;
 
@@ -319,7 +319,7 @@ void DisplayCB()
 	T2_t[2] = T2[2];
 	
 	if(visualizeRobots == 1){
-		glColor3d(0.5,0.5,0.5);
+		glColor3d(ROBOT_COLOR);
 		MVtoOGL(oglm,R2,T2);
 		glPushMatrix();
 		glMultMatrixd(oglm);
@@ -335,7 +335,7 @@ void DisplayCB()
 	VpV(T3,T2_t,T3);
 
 	if(visualizeRobots == 1){
-		glColor3d(0.5,0.5,0.5);
+		glColor3d(ROBOT_COLOR);
 		MVtoOGL(oglm,R3,T3);
 		glPushMatrix();
 		glMultMatrixd(oglm);
@@ -351,7 +351,7 @@ void DisplayCB()
 	VpV(T4,T4,T3);
 
 	if(visualizeRobots == 1){
-		glColor3d(0.5,0.5,0.5);
+		glColor3d(ROBOT_COLOR);
 		MVtoOGL(oglm,R4,T4);
 		glPushMatrix();
 		glMultMatrixd(oglm);
@@ -367,7 +367,7 @@ void DisplayCB()
 	VpV(T5,T4,T5);
 
 	if(visualizeRobots == 1){
-		glColor3d(0.5,0.5,0.5);
+		glColor3d(ROBOT_COLOR);
 		MVtoOGL(oglm,R5,T5);
 		glPushMatrix();
 		glMultMatrixd(oglm);
@@ -391,7 +391,7 @@ void DisplayCB()
 		glPopMatrix();
 	}
 
-	T2[0] =  50;
+	T2[0] =  20;
 	T2[1] =  0;
 	T2[2] =  0;
 
@@ -399,7 +399,7 @@ void DisplayCB()
 	VpV(T7,T6,Tt);
 
 	if(visualizeRobots == 1){
-		glColor3d(1.0,1.0,1.0);//.5,.5);
+		glColor3d(0.1,0.1,0.1);//.5,.5);
 		MVtoOGL(oglm,R7,T7);
 		glPushMatrix();
 		glMultMatrixd(oglm);
@@ -407,13 +407,31 @@ void DisplayCB()
 		glPopMatrix();
 	}
 
-	// pm(R6, "R6");
-	// pv(T7, "T7");
+	T2[0] =  400.7+435+22;
+	T2[1] =  0;
+	T2[2] =  300;
+
+	MRotY(Mbox,-3.1416/2);  //link 6 rotate X
+	MxM(Rbox,R7,Mbox);
+	MxV(Tt,R6,T2);
+	VpV(T7,T6,Tt);
+
+	if(visualizeRobots == 1){
+		glColor3d(0.6235,0.9529,0.7569);//.5,.5);
+		MVtoOGL(oglm,Rbox,T7);
+		glPushMatrix();
+		glMultMatrixd(oglm);
+		box_to_draw->Draw();
+		glPopMatrix();
+	}
+
+	pm(R7, "R7");
+	pv(T7, "T7");
 
 	//ROBOT 2
 
 	// rotation matrix
-	MRotZ(M02,3.14159265/2+offsetRot);     //base rotate Z
+	MRotZ(M02,offsetRot/2);     //base rotate Z
 	MxM(R02,M02,M02);
 
 	MRotZ(M12,rot12);  //link 1 rotate Z
@@ -434,19 +452,22 @@ void DisplayCB()
 	MRotX(M62,rot62);  //link 6 rotate X
 	MxM(R62,R52,M62);
 
-	MRotY(M72,3.1415826/2);
+	MRotY(M72,0);
 	MxM(R72,R62,M72);
 
 	//define kinematics
 
-	T02[0] =  -offsetX/2;
-	T02[1] =  offsetY/2;
-	T02[2] =  offsetZ/2;
+	T02[0] =  -offsetY;
+	T02[1] =  offsetX/2;
+	T02[2] =  ROBOT2_HEIGHT;
 
-	MxV(T02,R02,T02);
+	MxV(Tt,R02,T02);
+	T02[0] = Tt[0];
+	T02[1] = Tt[1];
+	T02[2] = Tt[2];
 
 	if(visualizeRobots == 1){
-		glColor3d(0.5,0.5,0.5);
+		glColor3d(ROBOT_COLOR);
 		MVtoOGL(oglm,R02,T02);
 		glPushMatrix();
 		glMultMatrixd(oglm);
@@ -462,7 +483,7 @@ void DisplayCB()
 	VpV(T12,T02,T12);
 
 	if(visualizeRobots == 1){
-		glColor3d(0.5,0.5,0.5);
+		glColor3d(ROBOT_COLOR);
 		MVtoOGL(oglm,R12,T12);
 		glPushMatrix();
 		glMultMatrixd(oglm);
@@ -470,7 +491,7 @@ void DisplayCB()
 		glPopMatrix();
 	}
 
-	T22[0] =  400+125; //??
+	T22[0] =  524.5; 
 	T22[1] =  -183.5;
 	T22[2] =  199;
 
@@ -482,7 +503,7 @@ void DisplayCB()
 	T2_t2[2] = T22[2];
 
 	if(visualizeRobots == 1){
-		glColor3d(0.5,0.5,0.5);
+		glColor3d(ROBOT_COLOR);
 		MVtoOGL(oglm,R22,T22);
 		glPushMatrix();
 		glMultMatrixd(oglm);
@@ -498,7 +519,7 @@ void DisplayCB()
 	VpV(T32,T2_t2,T32);
 
 	if(visualizeRobots == 1){
-		glColor3d(0.5,0.5,0.5);
+		glColor3d(ROBOT_COLOR);
 		MVtoOGL(oglm,R32,T32);
 		glPushMatrix();
 		glMultMatrixd(oglm);
@@ -514,7 +535,7 @@ void DisplayCB()
 	VpV(T42,T42,T32);
 
 	if(visualizeRobots == 1){
-		glColor3d(0.5,0.5,0.5);
+		glColor3d(ROBOT_COLOR);
 		MVtoOGL(oglm,R42,T42);
 		glPushMatrix();
 		glMultMatrixd(oglm);
@@ -530,7 +551,7 @@ void DisplayCB()
 	VpV(T52,T42,T52);
 
 	if(visualizeRobots == 1){
-		glColor3d(0.5,0.5,0.5);
+		glColor3d(ROBOT_COLOR);
 		MVtoOGL(oglm,R52,T52);
 		glPushMatrix();
 		glMultMatrixd(oglm);
@@ -546,7 +567,7 @@ void DisplayCB()
 	VpV(T62,T52,T62);
 
 	if(visualizeRobots == 1){
-		glColor3d(0.0,0.0,0.0);
+		glColor3d(0.05,0.05,0.05);
 		MVtoOGL(oglm,R62,T62);
 		glPushMatrix();
 		glMultMatrixd(oglm);
@@ -554,7 +575,112 @@ void DisplayCB()
 		glPopMatrix();
 	}
 
-	// Ti[0]=0;Ti[1]=0;Ti[2]=0;
+	// /*pm(R22, "R2");
+	// pv(T22, "T2");
+	// pv(T2_t2, "T2_t");
+	// pm(R32, "R3");
+	// pv(T32, "T3");
+	// pm(R42, "R4");
+	// pv(T42, "T4");
+	// pm(R52, "R5");
+	// pv(T52, "T5");
+	// pm(R62, "R6");
+	// pv(T62, "T6");
+	// pv(T72, "T6");*/
+
+	T22[0] =  22;
+	T22[1] =  0.0;
+	T22[2] =  0;
+
+	MxV(T72,R62,T22);
+	VpV(T72,T62,T72);
+
+	if(visualizeRobots == 1){
+		glColor3d(0.1,0.1,0.1);
+		MVtoOGL(oglm,R72,T72);
+		glPushMatrix();
+		glMultMatrixd(oglm);
+		EE_to_draw->Draw();
+		glPopMatrix();
+	}
+
+	pm(R62, "R62");
+	pv(T72, "T72");
+
+	// Environment I
+	if (withObs && env == 1) {
+
+		// chassis
+		MRotZ(Mobs,-3.1416/2);
+		//MxM(R0,Mobs,Mobs);
+
+		Tobs[0] =  1500;
+		Tobs[1] =  2100;
+		Tobs[2] =  0;
+
+		if(visualize == 1 && withObs) {
+			glColor3d(99./255,100./255,95./255);
+			MVtoOGL(oglm,Mobs,Tobs);
+			glPushMatrix();
+			glMultMatrixd(oglm);
+			chassis_to_draw->Draw();
+			glPopMatrix();
+		}
+
+		// Conveyor
+		MRotZ(Mobs,0);
+		//MxM(R0,Mobs,Mobs);
+
+		Tobs[0] =  offsetX/2;
+		Tobs[1] =  0;
+		Tobs[2] =  0;
+
+		if(visualize == 1 && withObs) {
+			glColor3d(235./255,243./255,159./255);
+			MVtoOGL(oglm,Mobs,Tobs);
+			glPushMatrix();
+			glMultMatrixd(oglm);
+			conveyor_to_draw->Draw();
+			glPopMatrix();
+		}
+
+		// b1
+		MRotZ(Mobs,0);
+		//MxM(R0,Mobs,Mobs);
+
+		Tobs[0] =  -offsetX/2;
+		Tobs[1] =  0;
+		Tobs[2] =  0;
+
+		if(visualize == 1 && withObs) {
+			glColor3d(1.0,1.0,1.0);
+			MVtoOGL(oglm,Mobs,Tobs);
+			glPushMatrix();
+			glMultMatrixd(oglm);
+			b1_to_draw->Draw();
+			glPopMatrix();
+		}
+
+		// b2
+		MRotZ(Mobs,0);
+		//MxM(R0,Mobs,Mobs);
+
+		Tobs[0] =  offsetX/2;
+		Tobs[1] =  offsetY;
+		Tobs[2] =  0;
+
+		if(visualize == 1 && withObs) {
+			glColor3d(1.0,1.0,1.0);
+			MVtoOGL(oglm,Mobs,Tobs);
+			glPushMatrix();
+			glMultMatrixd(oglm);
+			b2_to_draw->Draw();
+			glPopMatrix();
+		}
+
+	}
+
+		// Ti[0]=0;Ti[1]=0;Ti[2]=0;
 	// if(visualize == 1){
 	// 	glColor3d(.93, .69, .13);//94.0/255,48.0/255,13.0/255);//0.0,0.0,1.0);//
 	// 	MVtoOGL(oglm,R0,Ti);
@@ -580,194 +706,6 @@ void DisplayCB()
 	// 	glPopMatrix();
 	// }
 
-
-	// /*pm(R22, "R2");
-	// pv(T22, "T2");
-	// pv(T2_t2, "T2_t");
-	// pm(R32, "R3");
-	// pv(T32, "T3");
-	// pm(R42, "R4");
-	// pv(T42, "T4");
-	// pm(R52, "R5");
-	// pv(T52, "T5");
-	// pm(R62, "R6");
-	// pv(T62, "T6");
-	// pv(T72, "T6");*/
-
-	T22[0] =  50;
-	T22[1] =  0.0;
-	T22[2] =  0;
-
-	MxV(T72,R62,T22);
-	VpV(T72,T62,T72);
-
-	if(visualizeRobots == 1){
-		glColor3d(1.0,1.0,1.0);
-		MVtoOGL(oglm,R72,T72);
-		glPushMatrix();
-		glMultMatrixd(oglm);
-		EE_to_draw->Draw();
-		glPopMatrix();
-	}
-
-	// pm(R62, "R62");
-	// pv(T72, "T72");
-
-	// Environment I
-	if (withObs && env == 1) {
-
-		// Obs 1
-		MRotZ(Mobs,0);
-		//MxM(R0,Mobs,Mobs);
-
-		Tobs[0] =  0;
-		Tobs[1] =  0;
-		Tobs[2] =  0;
-
-		if(visualize == 1 && withObs) {
-			glColor3d(1.0,1.0,1.0);
-			MVtoOGL(oglm,Mobs,Tobs);
-			glPushMatrix();
-			glMultMatrixd(oglm);
-			obs1_to_draw->Draw();
-			glPopMatrix();
-		}
-
-		double dObs = 250;
-
-		// Obs 2
-		MRotZ(Mobs,0);
-		//MxM(R0,Mobs,Mobs);
-
-		Tobs[0] =  dObs;
-		Tobs[1] =  dObs;
-		Tobs[2] =  0;
-
-		if(visualize == 1 && withObs) {
-			glColor3d(1.0,1.0,1.0);
-			MVtoOGL(oglm,Mobs,Tobs);
-			glPushMatrix();
-			glMultMatrixd(oglm);
-			obs2_to_draw->Draw();
-			glPopMatrix();
-		}
-
-		// Obs 1
-		MRotZ(Mobs,0);
-		//MxM(R0,Mobs,Mobs);
-
-		Tobs[0] =  -dObs;
-		Tobs[1] =  -dObs;
-		Tobs[2] =  0;
-
-		if(visualize == 1 && withObs) {
-			glColor3d(1.0,1.0,1.0);
-			MVtoOGL(oglm,Mobs,Tobs);
-			glPushMatrix();
-			glMultMatrixd(oglm);
-			obs3_to_draw->Draw();
-			glPopMatrix();
-		}
-	}
-
-	// Environment II
-	if (withObs && env == 2) {
-
-		// Obs 1
-		MRotZ(Mobs,0);
-		//MxM(R0,Mobs,Mobs);
-
-		Tobs[0] =  0;
-		Tobs[1] =  0;
-		Tobs[2] =  0;
-
-		if(visualize == 1 && withObs) {
-			glColor4f(1.0,0.0,0.0,1);
-			MVtoOGL(oglm,Mobs,Tobs);
-			glPushMatrix();
-			glMultMatrixd(oglm);
-			obs1_to_draw->Draw();
-			glPopMatrix();
-		}
-
-		// Obs 2
-		MRotX(Mobs,3.14);
-		//MxM(R0,Mobs,Mobs);
-
-		Tobs[0] =  0;
-		Tobs[1] =  0;
-		Tobs[2] =  790;
-
-		if(visualize == 1 && withObs) {
-			glColor4f(1.0,0.0,0.0,1);
-			MVtoOGL(oglm,Mobs,Tobs);
-			glPushMatrix();
-			glMultMatrixd(oglm);
-			obs2_to_draw->Draw();
-			glPopMatrix();
-		}
-	}
-
-	/*
-  PQP_REAL rel_err=0, abs_err=0;
-  int qsize = 2;
-  PQP_DistanceResult dres[14];
-
-  // perform tolerance query
-
-
-  PQP_Distance(&dres[0],R6,T7,&rod,R0,T0,&base,rel_err,abs_err,qsize);
-  PQP_Distance(&dres[1],R6,T7,&rod,R1,T1,&link1,rel_err,abs_err,qsize);
-  PQP_Distance(&dres[2],R6,T7,&rod,R2,T2_t,&link2,rel_err,abs_err,qsize);
-  PQP_Distance(&dres[3],R6,T7,&rod,R3,T3,&link3,rel_err,abs_err,qsize);
-  PQP_Distance(&dres[4],R6,T7,&rod,R4,T4,&link4,rel_err,abs_err,qsize);
-  PQP_Distance(&dres[5],R6,T7,&rod,R5,T5,&link5,rel_err,abs_err,qsize);
-  PQP_Distance(&dres[6],R6,T7,&rod,R6,T6,&link6,rel_err,abs_err,qsize);
-  PQP_Distance(&dres[7],R6,T7,&rod,R02,T02,&base2,rel_err,abs_err,qsize);
-  PQP_Distance(&dres[8],R6,T7,&rod,R12,T12,&link12,rel_err,abs_err,qsize);
-  PQP_Distance(&dres[9],R6,T7,&rod,R22,T2_t2,&link22,rel_err,abs_err,qsize);
-  PQP_Distance(&dres[10],R6,T7,&rod,R32,T32,&link32,rel_err,abs_err,qsize);
-  PQP_Distance(&dres[11],R6,T7,&rod,R42,T42,&link42,rel_err,abs_err,qsize);
-  PQP_Distance(&dres[12],R6,T7,&rod,R52,T52,&link52,rel_err,abs_err,qsize);
-  PQP_Distance(&dres[13],R6,T7,&rod,R62,T62,&link62,rel_err,abs_err,qsize);
-	 */
-
-	for(int i=0;i<RodStates[step].size();i++){
-		PQP_REAL P[3],V[3],D1[3],D2[3],P1[3],P2[3];
-		P[0]=RodStates[step][i][0];
-		P[1]=RodStates[step][i][1];
-		P[2]=RodStates[step][i][2];
-
-		MxVpV(V,R6,P,T7);
-		glColor3d(0.0,0.0,0.0);
-		glPushMatrix();
-		glTranslated(V[0],V[1],V[2]);
-		glutSolidSphere(14,15,15); //(8,15,15)
-		glPopMatrix();
-
-		/*for (int i=0; i<3; i++) {
-    	for (int j=0; j<3; j++)
-    		std::cout << R6[i][j] << " ";
-    	std::cout << std::endl;
-    }
-    for (int i=0; i<3; i++)
-    	std::cout << T7[i] << std::endl;*/
-
-		//checks some point on rod w/ some point on a link: proof works
-		/*
-    VcV(P1,dres[9].P1());
-    VcV(P2,dres[9].P2());
-    MxVpV(D1,R6,P1,T6);
-    MxVpV(D2,R22,P2,T2_t2);
-
-    glDisable(GL_LIGHTING);
-    glBegin(GL_LINES);
-    glVertex3v(D1);
-    glVertex3v(D2);
-    glEnd();
-    glEnable(GL_LIGHTING);
-		 */
-	}
 
 	EndDraw();
 }
@@ -935,10 +873,10 @@ void load_models(){
 	fclose(fp);
 
 	// initialize EE
-	EE_to_draw = new Model("EE_r.tris");
+	EE_to_draw = new Model("ee.tris");
 
-	fp = fopen("EE_r.tris","r");
-	if (fp == NULL) { fprintf(stderr,"Couldn't open EE_r.tris\n"); exit(-1); }
+	fp = fopen("ee.tris","r");
+	if (fp == NULL) { fprintf(stderr,"Couldn't open ee.tris\n"); exit(-1); }
 	fscanf(fp,"%d",&ntris);
 
 	EE.BeginModel();
@@ -1114,10 +1052,10 @@ void load_models(){
 	fclose(fp);
 
 	// initialize EE
-	EE_to_draw2 = new Model("EE_r.tris");
+	EE_to_draw2 = new Model("ee.tris");
 
-	fp = fopen("EE_r.tris","r");
-	if (fp == NULL) { fprintf(stderr,"Couldn't open EE_r.tris\n"); exit(-1); }
+	fp = fopen("ee.tris","r");
+	if (fp == NULL) { fprintf(stderr,"Couldn't open ee.tris\n"); exit(-1); }
 	fscanf(fp,"%d",&ntris);
 
 	EE2.BeginModel();
@@ -1162,13 +1100,13 @@ void load_models(){
 
 		if (env == 1) {
 			// initialize obs1
-			obs1_to_draw = new Model("obs.tris");
+			chassis_to_draw = new Model("chassis.tris");
 
-			fp = fopen("obs.tris","r");
-			if (fp == NULL) { fprintf(stderr,"Couldn't open table.tris\n"); exit(-1); }
+			fp = fopen("chassis.tris","r");
+			if (fp == NULL) { fprintf(stderr,"Couldn't open chassis.tris\n"); exit(-1); }
 			fscanf(fp,"%d",&ntris);
 
-			obs1.BeginModel();
+			chassis.BeginModel();
 			for (i = 0; i < ntris; i++)
 			{
 				double p1x,p1y,p1z,p2x,p2y,p2z,p3x,p3y,p3z;
@@ -1178,19 +1116,19 @@ void load_models(){
 				p1[0] = (PQP_REAL)p1x; p1[1] = (PQP_REAL)p1y; p1[2] = (PQP_REAL)p1z;
 				p2[0] = (PQP_REAL)p2x; p2[1] = (PQP_REAL)p2y; p2[2] = (PQP_REAL)p2z;
 				p3[0] = (PQP_REAL)p3x; p3[1] = (PQP_REAL)p3y; p3[2] = (PQP_REAL)p3z;
-				obs1.AddTri(p1,p2,p3,i);
+				chassis.AddTri(p1,p2,p3,i);
 			}
-			obs1.EndModel();
+			chassis.EndModel();
 			fclose(fp);
 
-			// initialize obs2
-			obs2_to_draw = new Model("obs.tris");
+			// initialize box
+			box_to_draw = new Model("box.tris");
 
-			fp = fopen("obs.tris","r");
-			if (fp == NULL) { fprintf(stderr,"Couldn't open table.tris\n"); exit(-1); }
+			fp = fopen("box.tris","r");
+			if (fp == NULL) { fprintf(stderr,"Couldn't open box.tris\n"); exit(-1); }
 			fscanf(fp,"%d",&ntris);
 
-			obs2.BeginModel();
+			box.BeginModel();
 			for (i = 0; i < ntris; i++)
 			{
 				double p1x,p1y,p1z,p2x,p2y,p2z,p3x,p3y,p3z;
@@ -1200,19 +1138,64 @@ void load_models(){
 				p1[0] = (PQP_REAL)p1x; p1[1] = (PQP_REAL)p1y; p1[2] = (PQP_REAL)p1z;
 				p2[0] = (PQP_REAL)p2x; p2[1] = (PQP_REAL)p2y; p2[2] = (PQP_REAL)p2z;
 				p3[0] = (PQP_REAL)p3x; p3[1] = (PQP_REAL)p3y; p3[2] = (PQP_REAL)p3z;
-				obs2.AddTri(p1,p2,p3,i);
+				box.AddTri(p1,p2,p3,i);
 			}
-			obs2.EndModel();
+			box.EndModel();
+			fclose(fp);
+
+			// initialize b1
+			b1_to_draw = new Model("b1.tris");
+
+			fp = fopen("b1.tris","r");
+			if (fp == NULL) { fprintf(stderr,"Couldn't open b1.tris\n"); exit(-1); }
+			fscanf(fp,"%d",&ntris);
+
+			b1.BeginModel();
+			for (i = 0; i < ntris; i++)
+			{
+				double p1x,p1y,p1z,p2x,p2y,p2z,p3x,p3y,p3z;
+				fscanf(fp,"%lf %lf %lf %lf %lf %lf %lf %lf %lf",
+						&p1x,&p1y,&p1z,&p2x,&p2y,&p2z,&p3x,&p3y,&p3z);
+				PQP_REAL p1[3],p2[3],p3[3];
+				p1[0] = (PQP_REAL)p1x; p1[1] = (PQP_REAL)p1y; p1[2] = (PQP_REAL)p1z;
+				p2[0] = (PQP_REAL)p2x; p2[1] = (PQP_REAL)p2y; p2[2] = (PQP_REAL)p2z;
+				p3[0] = (PQP_REAL)p3x; p3[1] = (PQP_REAL)p3y; p3[2] = (PQP_REAL)p3z;
+				b1.AddTri(p1,p2,p3,i);
+			}
+			b1.EndModel();
+			fclose(fp);
+
+
+			// initialize b2
+			b2_to_draw = new Model("b2.tris");
+
+			fp = fopen("b1.tris","r");
+			if (fp == NULL) { fprintf(stderr,"Couldn't open b2.tris\n"); exit(-1); }
+			fscanf(fp,"%d",&ntris);
+
+			b2.BeginModel();
+			for (i = 0; i < ntris; i++)
+			{
+				double p1x,p1y,p1z,p2x,p2y,p2z,p3x,p3y,p3z;
+				fscanf(fp,"%lf %lf %lf %lf %lf %lf %lf %lf %lf",
+						&p1x,&p1y,&p1z,&p2x,&p2y,&p2z,&p3x,&p3y,&p3z);
+				PQP_REAL p1[3],p2[3],p3[3];
+				p1[0] = (PQP_REAL)p1x; p1[1] = (PQP_REAL)p1y; p1[2] = (PQP_REAL)p1z;
+				p2[0] = (PQP_REAL)p2x; p2[1] = (PQP_REAL)p2y; p2[2] = (PQP_REAL)p2z;
+				p3[0] = (PQP_REAL)p3x; p3[1] = (PQP_REAL)p3y; p3[2] = (PQP_REAL)p3z;
+				b2.AddTri(p1,p2,p3,i);
+			}
+			b2.EndModel();
 			fclose(fp);
 
 			// initialize obs3
-			obs3_to_draw = new Model("obs.tris");
+			conveyor_to_draw = new Model("conveyor.tris");
 
-			fp = fopen("obs.tris","r");
-			if (fp == NULL) { fprintf(stderr,"Couldn't open table.tris\n"); exit(-1); }
+			fp = fopen("conveyor.tris","r");
+			if (fp == NULL) { fprintf(stderr,"Couldn't open conveyor.tris\n"); exit(-1); }
 			fscanf(fp,"%d",&ntris);
 
-			obs3.BeginModel();
+			conveyor.BeginModel();
 			for (i = 0; i < ntris; i++)
 			{
 				double p1x,p1y,p1z,p2x,p2y,p2z,p3x,p3y,p3z;
@@ -1222,55 +1205,9 @@ void load_models(){
 				p1[0] = (PQP_REAL)p1x; p1[1] = (PQP_REAL)p1y; p1[2] = (PQP_REAL)p1z;
 				p2[0] = (PQP_REAL)p2x; p2[1] = (PQP_REAL)p2y; p2[2] = (PQP_REAL)p2z;
 				p3[0] = (PQP_REAL)p3x; p3[1] = (PQP_REAL)p3y; p3[2] = (PQP_REAL)p3z;
-				obs3.AddTri(p1,p2,p3,i);
+				conveyor.AddTri(p1,p2,p3,i);
 			}
-			obs3.EndModel();
-			fclose(fp);
-		}
-
-		if (env == 2) {
-			// initialize obs1
-			obs1_to_draw = new Model("cone.tris");
-
-			fp = fopen("cone.tris","r");
-			if (fp == NULL) { fprintf(stderr,"Couldn't open table.tris\n"); exit(-1); }
-			fscanf(fp,"%d",&ntris);
-
-			obs1.BeginModel();
-			for (i = 0; i < ntris; i++)
-			{
-				double p1x,p1y,p1z,p2x,p2y,p2z,p3x,p3y,p3z;
-				fscanf(fp,"%lf %lf %lf %lf %lf %lf %lf %lf %lf",
-						&p1x,&p1y,&p1z,&p2x,&p2y,&p2z,&p3x,&p3y,&p3z);
-				PQP_REAL p1[3],p2[3],p3[3];
-				p1[0] = (PQP_REAL)p1x; p1[1] = (PQP_REAL)p1y; p1[2] = (PQP_REAL)p1z;
-				p2[0] = (PQP_REAL)p2x; p2[1] = (PQP_REAL)p2y; p2[2] = (PQP_REAL)p2z;
-				p3[0] = (PQP_REAL)p3x; p3[1] = (PQP_REAL)p3y; p3[2] = (PQP_REAL)p3z;
-				obs1.AddTri(p1,p2,p3,i);
-			}
-			obs1.EndModel();
-			fclose(fp);
-
-			// initialize obs2
-			obs2_to_draw = new Model("cone.tris");
-
-			fp = fopen("cone.tris","r");
-			if (fp == NULL) { fprintf(stderr,"Couldn't open table.tris\n"); exit(-1); }
-			fscanf(fp,"%d",&ntris);
-
-			obs2.BeginModel();
-			for (i = 0; i < ntris; i++)
-			{
-				double p1x,p1y,p1z,p2x,p2y,p2z,p3x,p3y,p3z;
-				fscanf(fp,"%lf %lf %lf %lf %lf %lf %lf %lf %lf",
-						&p1x,&p1y,&p1z,&p2x,&p2y,&p2z,&p3x,&p3y,&p3z);
-				PQP_REAL p1[3],p2[3],p3[3];
-				p1[0] = (PQP_REAL)p1x; p1[1] = (PQP_REAL)p1y; p1[2] = (PQP_REAL)p1z;
-				p2[0] = (PQP_REAL)p2x; p2[1] = (PQP_REAL)p2y; p2[2] = (PQP_REAL)p2z;
-				p3[0] = (PQP_REAL)p3x; p3[1] = (PQP_REAL)p3y; p3[2] = (PQP_REAL)p3z;
-				obs2.AddTri(p1,p2,p3,i);
-			}
-			obs2.EndModel();
+			conveyor.EndModel();
 			fclose(fp);
 		}
 
@@ -1357,47 +1294,6 @@ void execute_path(int k){
 
 		fclose(fr);
 
-		fro = fopen(rod_pfile,"r");
-		if (fro == NULL) { fprintf(stderr,"Couldn't open rod_path.txt\n"); exit(-1); }
-		fscanf(fro,"%i",&nlines);  //DO include number in line count itself
-
-		int config_num = 0;
-		RodStates.resize(nlines/500);
-
-		for(i=0;i<nlines/500;i++){
-			RodStates[i].resize(500);
-			for(int j=0;j<500;j++){
-				RodStates[i][j].resize(3);
-			}
-		}
-
-
-		for (i = 2; i <= nlines; i++)
-		{
-			double px,py,pz;
-			if (i-501*config_num == 502){
-				config_num += 1;
-				continue;
-			}
-
-			fscanf(fro,"%lf %lf %lf",&px,&py,&pz);
-
-			int index = i-501*config_num-2;
-
-			if (config_num == 0 && i < 500){index=i-2;}
-
-			if (index == 500){std::cout << "error in indexing" << std::endl; break;}
-
-			RodStates[config_num][index][0]=px;
-			RodStates[config_num][index][1]=py;
-			RodStates[config_num][index][2]=pz;
-		}
-
-		fclose(fro);
-
-		if(RodStates.size() != RoboStates.size()){
-			std::cout << "error! Non-equal sizes" << std::endl;
-		}
 	}
 
 	rot1 = RoboStates[k][0];
@@ -1417,28 +1313,6 @@ void execute_path(int k){
 	//	std::cout << RoboStates[k][jj] << " ";
 	//std::cout << std::endl;
 
-	rod.BeginModel();
-
-	for (int i=0; i<RodStates[k].size()/3; i++){
-		PQP_REAL p1[3],p2[3],p3[3];
-		p1[0] = RodStates[k][3*i][0];
-		p1[1] = RodStates[k][3*i][1];
-		p1[2] = RodStates[k][3*i][2];  //P1
-		p2[0] = RodStates[k][3*i+1][0];
-		p2[1] = RodStates[k][3*i+1][1];
-		p2[2] = RodStates[k][3*i+1][2];  //P2
-		p3[0] = RodStates[k][3*i+2][0];
-		p3[1] = RodStates[k][3*i+2][1];
-		p3[2] = RodStates[k][3*i+2][2];  //P3
-		rod.AddTri(p1,p2,p3,i);
-	}
-
-	rod.EndModel();
-
-	PQP_DistanceResult dres;
-	PQP_REAL rel_err = 0.0;
-	PQP_REAL abs_err = 0.0;
-	PQP_Distance(&dres,R0,T0,&rod,R0,T0,&base,rel_err,abs_err);
 
 	glutPostRedisplay();
 	if(k<RoboStates.size()-1){
@@ -1455,38 +1329,10 @@ void execute_path(int k){
 	}
 
 	// Automatic update from file - will cause stack overflow
-	//step = 0;
-	//glutTimerFunc(10, execute_path, 0);
+	step = 0;
+	glutTimerFunc(10, execute_path, 0);
 }
 
-int fake_rod() {
-	const char* robot_pfile = "../paths/path.txt";
-	FILE *fr = fopen(robot_pfile,"r");
-	int nlines;
-	fscanf(fr,"%i",&nlines);  //NOT include number in line count itself
-	std::cout << "Num: " << nlines << std::endl;
-	fclose(fr);
-
-	const char* rod_pfile = "../paths/rod.txt";
-
-	FILE *f = fopen(rod_pfile, "w");
-
-	fprintf(f, "%d\n", 501*nlines);
-
-	double L;
-	if (env == 1)
-		L = ROD_LENGTH;
-	else if (env == 2)
-		L = ROD_LENGTH_ENVII;
-
-	double dt = L/500;
-	for (int i=0; i<nlines; i++) {
-		for (int j = 0; j<500; j++)
-			fprintf(f, "%f 0 0\n", j*dt);
-		fprintf(f, "\n");
-	}
-	fclose(f);
-}
 
 int main(int argc, char **argv)
 {
@@ -1529,16 +1375,10 @@ int main(int argc, char **argv)
 		env = 1;
 	}
 
-	fake_rod(); // Create a fake rod file
-
 	glutInit(&argc, argv);
 	glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH | GLUT_MULTISAMPLE);
 
 	// create the window
-
-	if (env == 2)
-		offsetX = ROBOTS_DISTANCE_ENVII;
-
 	glutCreateWindow("Robot View");
 
 	// load robot meshes
@@ -1561,5 +1401,5 @@ int main(int argc, char **argv)
 	glutMainLoop();
 }
 
-
+// On the conveyor: -0.15 0.33 -0.05 0 1.27 -1.7 0 0 0 0 0 0 0
 

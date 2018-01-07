@@ -1,20 +1,19 @@
 #include "apc_class.h"
 
 // Constructor for the robots
-two_robots::two_robots(State pose_1, State pose_2, double rod_length) {
+two_robots::two_robots() {
 	b = 344; // Height of base
-	l1x = 525; 
+	l1x = 524.5; 
 	l1z = 199;
 	l2 = 1250; 
 	l3x = 186.5; 
 	l3z = 210; 
 	l4 = 1250; 
 	l5 = 116.5; 
-	lee = 50; 
+	lee = 400.7+22; 
 
-	L = rod_length; // Length of grasped rod
 	initMatrix(Q, 4, 4);
-	Q = {{1,0,0,L},{0,1,0,0},{0,0,1,0},{0,0,0,1}}; // Rod transformation from one end-tip to the other
+	Q = {{0,0,-1,435/2},{0,1,0,0},{1,0,0,300+450},{0,0,0,1}}; // Rod transformation from one end-tip to the other
 
 	// Joint limits
 	q1minmax = deg2rad(180);
@@ -27,8 +26,8 @@ two_robots::two_robots(State pose_1, State pose_2, double rod_length) {
 	q6minmax = deg2rad(400);
 
 	// V_pose_rob_i_o is a vector of {x,y,z,angleZ} which is the position and orientation around the z axis of robot i
-	V_pose_rob_1_o = pose_1;
-	V_pose_rob_2_o = pose_2;
+	V_pose_rob_1_o = {-ROBOTS_DISTANCE_X/2, 0, ROBOT1_HEIGHT, 0};
+	V_pose_rob_2_o = {ROBOTS_DISTANCE_X/2, ROBOTS_DISTANCE_Y, ROBOT2_HEIGHT, ROBOT2_ROT};;
 
 	initMatrix(T_fk_solution_1, 4, 4);
 	initVector(p_fk_solution_1, 3);
@@ -378,6 +377,8 @@ bool two_robots::calc_specific_IK_solution_R1(Matrix T, State q1, int IKsol) {
 	FKsolve_rob(q1, 1);
 	T2 = MatricesMult(get_FK_solution_T1(), T); // Returns the opposing required matrix of the rods tip at robot 2
 	T2 = MatricesMult(T2, {{-1, 0, 0, 0}, {0, -1, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}}); // Returns the REQUIRED matrix of the rods tip at robot 2
+
+	printMatrix(T2);
 
 	bool result = false;
 	if (IKsolve_rob(T2, 2, IKsol))

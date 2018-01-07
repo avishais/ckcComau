@@ -7,6 +7,8 @@
 #include <ctime>
 #include <math.h>
 
+#include "def.h"
+
 #define PI_ 3.1416
 #define NUM_IK_SOLUTIONS 8
 
@@ -46,7 +48,7 @@ private:
 
 public:
 	/** Constructor */
-	two_robots(State, State, double);
+	two_robots();
 
 	/** Forward kinematics */
 	void FKsolve_rob(State, int);
