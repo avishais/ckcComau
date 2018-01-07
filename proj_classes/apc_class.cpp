@@ -378,8 +378,6 @@ bool two_robots::calc_specific_IK_solution_R1(Matrix T, State q1, int IKsol) {
 	T2 = MatricesMult(get_FK_solution_T1(), T); // Returns the opposing required matrix of the rods tip at robot 2
 	T2 = MatricesMult(T2, {{-1, 0, 0, 0}, {0, -1, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}}); // Returns the REQUIRED matrix of the rods tip at robot 2
 
-	printMatrix(T2);
-
 	bool result = false;
 	if (IKsolve_rob(T2, 2, IKsol))
 		result = true;

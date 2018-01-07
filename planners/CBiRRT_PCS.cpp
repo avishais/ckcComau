@@ -289,6 +289,10 @@ ompl::geometric::CBiRRT::Motion* ompl::geometric::CBiRRT::growTree(TreeData &tre
 			tgi.xmotion = motion;
 			tree->add(motion);
 
+			// cout << "--------------------------------\n";
+			// printStateVector(motion->root);
+			// printStateVector(motion->state);
+
 			nmotion = motion;
 
 			if (reach) {
@@ -325,11 +329,12 @@ ompl::base::PlannerStatus ompl::geometric::CBiRRT::solve(const base::PlannerTerm
 	while (const base::State *st = pis_.nextStart())
 	{
 		ik = identify_state_ik(st);
-		retrieveStateVector(st, q1, q2);
-		if (ik[0]==-1 || ik[1] == -1 || collision_state(getPMatrix(), q1, q2)) {
-			OMPL_ERROR("%s: Start state not feasible!", getName().c_str());
-			return base::PlannerStatus::INVALID_START;
-		}
+		printVector(ik);
+		// retrieveStateVector(st, q1, q2);
+		// if (ik[0]==-1 || ik[1] == -1 || collision_state(getPMatrix(), q1, q2)) {
+		// 	OMPL_ERROR("%s: Start state not feasible!", getName().c_str());
+		// 	return base::PlannerStatus::INVALID_START;
+		// }
 
 		Motion *motion = new Motion(si_);
 		si_->copyState(motion->state, st);
@@ -383,11 +388,12 @@ ompl::base::PlannerStatus ompl::geometric::CBiRRT::solve(const base::PlannerTerm
 			if (st)
 			{
 				ik = identify_state_ik(st);
-				retrieveStateVector(st, q1, q2);
-				if (ik[0]==-1 || ik[1] == -1 || collision_state(getPMatrix(), q1, q2)) {
-					OMPL_ERROR("%s: Start state not feasible!", getName().c_str());
-					return base::PlannerStatus::INVALID_START;
-				}
+				printVector(ik);
+				// retrieveStateVector(st, q1, q2);
+				// if (ik[0]==-1 || ik[1] == -1 || collision_state(getPMatrix(), q1, q2)) {
+				// 	OMPL_ERROR("%s: Goal state not feasible!", getName().c_str());
+				// 	return base::PlannerStatus::INVALID_START;
+				// }
 
 				Motion *motion = new Motion(si_);
 				si_->copyState(motion->state, st);

@@ -425,8 +425,8 @@ void DisplayCB()
 		glPopMatrix();
 	}
 
-	pm(R7, "R7");
-	pv(T7, "T7");
+	// pm(R7, "R7");
+	// pv(T7, "T7");
 
 	//ROBOT 2
 
@@ -604,8 +604,8 @@ void DisplayCB()
 		glPopMatrix();
 	}
 
-	pm(R62, "R62");
-	pv(T72, "T72");
+	// pm(R62, "R62");
+	// pv(T72, "T72");
 
 	// Environment I
 	if (withObs && env == 1) {
@@ -631,8 +631,8 @@ void DisplayCB()
 		MRotZ(Mobs,0);
 		//MxM(R0,Mobs,Mobs);
 
-		Tobs[0] =  offsetX/2;
-		Tobs[1] =  0;
+		Tobs[0] =  offsetX/2+100;
+		Tobs[1] =  200;
 		Tobs[2] =  0;
 
 		if(visualize == 1 && withObs) {
@@ -680,7 +680,7 @@ void DisplayCB()
 
 	}
 
-		// Ti[0]=0;Ti[1]=0;Ti[2]=0;
+	Ti[0]=0;Ti[1]=0;Ti[2]=950;
 	// if(visualize == 1){
 	// 	glColor3d(.93, .69, .13);//94.0/255,48.0/255,13.0/255);//0.0,0.0,1.0);//
 	// 	MVtoOGL(oglm,R0,Ti);
@@ -697,14 +697,14 @@ void DisplayCB()
 	// 	room_to_draw->Draw();
 	// 	glPopMatrix();
 	// }
-	// if(visualize == 1){
-	// 	glColor3d(1.0,1.0,0.7);
-	// 	MVtoOGL(oglm,R0,Ti);
-	// 	glPushMatrix();
-	// 	glMultMatrixd(oglm);
-	// 	floor_to_draw->Draw();
-	// 	glPopMatrix();
-	// }
+	if(visualize == 1){
+		glColor3d(1.0,1.0,0.7);
+		MVtoOGL(oglm,R0,Ti);
+		glPushMatrix();
+		glMultMatrixd(oglm);
+		floor_to_draw->Draw();
+		glPopMatrix();
+	}
 
 
 	EndDraw();
@@ -1329,8 +1329,8 @@ void execute_path(int k){
 	}
 
 	// Automatic update from file - will cause stack overflow
-	step = 0;
-	glutTimerFunc(10, execute_path, 0);
+	//step = 0;
+	//glutTimerFunc(10, execute_path, 0);
 }
 
 

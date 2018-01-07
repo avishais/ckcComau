@@ -247,6 +247,8 @@ int main(int argn, char ** args) {
 
 	State c_start, c_goal;
 	if (env == 1) {
+    	c_start = {-0.04, 0.33, -0.05, 0, 1.2908, -1.6208, 0.00538822, 0.743805, -0.445341, -0.0157073, -0.298499, 0.0150128}; // On the conveyor  
+		c_goal = {1.57, 0.55, 0.73, 0, 0.2908, 0.0092, -1.19386, 1.0596, 0.00106656, -1.22915, -1.38548, 0.478077};  // Mounted on the chassis
 		Plan.set_environment(1);
 	}
 	else if (env == 2) {
@@ -256,21 +258,21 @@ int main(int argn, char ** args) {
 	int mode = 1;
 	switch (mode) {
 	case 1: {
-		StateValidityChecker svc(1);
+		// StateValidityChecker svc(1);
 		
-		while (1) {
-			State c_start = svc.sample_q();
-			State c_goal = svc.sample_q();
+		// while (1) {
+		// 	State c_start = svc.sample_q();
+		// 	State c_goal = svc.sample_q();
 
-			cout << svc.check_angle_limits(c_start) << endl;
-			cout << svc.check_angle_limits(c_goal) << endl;
-			//Plan.solved_bool = true;
+		// 	cout << svc.check_angle_limits(c_start) << endl;
+		// 	cout << svc.check_angle_limits(c_goal) << endl;
+		// 	//Plan.solved_bool = true;
 
 			Plan.plan(c_start, c_goal, runtime, ptype, 0.55);
 
-			if (Plan.solved_bool)
-				break;
-		}
+		// 	if (Plan.solved_bool)
+		// 		break;
+		// }
 
 		break;
 	}

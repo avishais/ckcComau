@@ -35,14 +35,14 @@ public:
 	StateValidityChecker(const ob::SpaceInformationPtr &si, int env = 1) :
 		mysi_(si.get()),
 		collisionDetection(env==1 ? ROBOTS_DISTANCE_ENV_I : ROBOTS_DISTANCE_ENV_II,0,0,0,env)
-			{L = env==1 ? ROD_LENGTH_ENV_I : ROD_LENGTH_ENV_II;
+			{
 			q_temp.resize(6);
 			setQ();
 			setP();
 			}; //Constructor
 	StateValidityChecker(int env = 1) :
 		collisionDetection(env==1 ? ROBOTS_DISTANCE_ENV_I : ROBOTS_DISTANCE_ENV_II,0,0,0,env)
-			{L = env==1 ? ROD_LENGTH_ENV_I : ROD_LENGTH_ENV_II;
+			{
 			q_temp.resize(6);
 			setQ();
 			setP();
@@ -132,16 +132,11 @@ public:
 
 	/** Set transformation matrix of rod end-tip in rod coordinate frame (at the other end-point) */
 	void setQ() {
-		State v(4);
 
-		v = {1,0,0,L};
-		Q.push_back(v);
-		v = {0,1,0,0};
-		Q.push_back(v);
-		v = {0,0,1,0};
-		Q.push_back(v);
-		v = {0,0,0,1};
-		Q.push_back(v);
+		Q.push_back({0,0,-1,250});
+		Q.push_back({0,1,0,0});
+		Q.push_back({1, 0, 0, 300+450});
+		Q.push_back({0, 0, 0, 1});
 	}
 
 	/** Set matrix of coordinated along the rod (in rod coordinate frame) */
@@ -213,7 +208,7 @@ private:
 	Matrix Q;
 	Matrix P;
 
-	bool withObs = true; // Include obstacles?
+	bool withObs = false; // Include obstacles?
 	double RBS_tol = 0.05; // RBS local connection resolution
 	int RBS_max_depth = 150; // Maximum RBS recursion depth
 
