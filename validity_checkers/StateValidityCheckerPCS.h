@@ -20,11 +20,6 @@
 
 #include <iostream>
 
-#define ROBOTS_DISTANCE_ENV_I 4000.
-#define ROD_LENGTH_ENV_I 500.
-#define ROBOTS_DISTANCE_ENV_II 1200.
-#define ROD_LENGTH_ENV_II 500.
-
 namespace ob = ompl::base;
 using namespace std;
 
@@ -32,20 +27,14 @@ class StateValidityChecker : public two_robots, public collisionDetection
 {
 public:
 	/** Constructors */
-	StateValidityChecker(const ob::SpaceInformationPtr &si, int env = 1) :
-		mysi_(si.get()),
-		collisionDetection(env==1 ? ROBOTS_DISTANCE_ENV_I : ROBOTS_DISTANCE_ENV_II,0,0,0,env)
+	StateValidityChecker(const ob::SpaceInformationPtr &si, int env = 1) : mysi_(si.get())
 			{
 			q_temp.resize(6);
 			setQ();
-			setP();
 			}; //Constructor
-	StateValidityChecker(int env = 1) :
-		collisionDetection(env==1 ? ROBOTS_DISTANCE_ENV_I : ROBOTS_DISTANCE_ENV_II,0,0,0,env)
-			{
+	StateValidityChecker(int env = 1) {
 			q_temp.resize(6);
 			setQ();
-			setP();
 			}; //Constructor
 
 	/** Validity check using standard OMPL */
@@ -120,11 +109,6 @@ public:
 		return valid_solution_index;
 	}
 
-	/** Return matrix of coordinated along the rod (in rod coordinate frame) */
-	Matrix getPMatrix() {
-		return P;
-	}
-
 	/** Return transformation matrix of rod end-tip in rod coordinate frame (at the other end-point) */
 	Matrix getQ() {
 		return Q;
@@ -137,17 +121,6 @@ public:
 		Q.push_back({0,1,0,0});
 		Q.push_back({1, 0, 0, 300+450});
 		Q.push_back({0, 0, 0, 1});
-	}
-
-	/** Set matrix of coordinated along the rod (in rod coordinate frame) */
-	void setP() {
-		State v(3);
-		int dl = 20;
-		int n = L / dl;
-		for (int i = 0; i <= n; i++) {
-			v = {(double)i*dl,0,0};
-			P.push_back(v);
-		}
 	}
 
 	/** Performance parameters measured during the planning */
@@ -206,9 +179,8 @@ private:
 
 	double L;
 	Matrix Q;
-	Matrix P;
 
-	bool withObs = false; // Include obstacles?
+	bool withObs = true; // Include obstacles?
 	double RBS_tol = 0.05; // RBS local connection resolution
 	int RBS_max_depth = 150; // Maximum RBS recursion depth
 

@@ -57,8 +57,8 @@ int main() {
 	Matrix Q;
 	Q.push_back({0, 0, -1, 250});
 	Q.push_back({0, 1, 0, 0});
-	Q.push_back({1, 0, 0, 300+450});
-    Q.push_back({0, 0, 0, 1});
+	Q.push_back();
+    Q.push_back();
     
     State q(12);
     State q1(6), q2(6, 0);

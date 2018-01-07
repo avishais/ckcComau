@@ -212,7 +212,7 @@ ompl::base::PlannerStatus ompl::geometric::RRT::solve(const base::PlannerTermina
 					ik[1] =  nmotion->ik_q2_active;
 				}
 			}
-			if (collision_state(getPMatrix(), q1, q2))
+			if (collision_state(q1, q2))
 				continue;
 
 			ik = identify_state_ik(q1, q2, ik);

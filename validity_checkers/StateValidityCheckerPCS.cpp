@@ -131,7 +131,7 @@ bool StateValidityChecker::IKproject(State &q1, State &q2, State &ik, int &activ
 
 	IK_time += double(clock() - sT) / CLOCKS_PER_SEC;
 
-	if (valid && withObs && collision_state(getPMatrix(), q1, q2))
+	if (valid && withObs && collision_state(q1, q2))
 		valid = false;
 
 	return valid;
@@ -215,7 +215,7 @@ bool StateValidityChecker::sample_q(ob::State *st) {
 		}
 
 		q = join_Vectors(q1, q2);
-		if (withObs && (collision_state(P, q1, q2) || !check_angle_limits(q))) {
+		if (withObs && (collision_state(q1, q2) || !check_angle_limits(q))) {
 			sampling_counter[1]++;
 			continue;
 		}
@@ -251,7 +251,7 @@ State StateValidityChecker::sample_q() {
 			continue;
 
 		q = join_Vectors(q1, q2);
-		if (withObs && (collision_state(P, q1, q2) || !check_angle_limits(q)))
+		if (withObs && (collision_state(q1, q2) || !check_angle_limits(q)))
 			continue;
 
 		break;
@@ -335,7 +335,7 @@ bool StateValidityChecker::isValid(const ob::State *state) {
 		State q_IK = get_IK_solution_q2();
 		if (normDistance(q2, q_IK) > 0.5e-1)
 			return false;
-		if (withObs && collision_state(P, q1, q_IK))
+		if (withObs && collision_state(q1, q_IK))
 			return false;
 	}
 	else
@@ -346,7 +346,7 @@ bool StateValidityChecker::isValid(const ob::State *state) {
 		State q_IK = get_IK_solution_q1();
 		if (normDistance(q1, q_IK) > 0.12)
 			return false;
-		if (withObs && collision_state(P, q_IK, q2))
+		if (withObs && collision_state(q_IK, q2))
 			return false;
 	}
 	else {
@@ -370,7 +370,7 @@ bool StateValidityChecker::isValid(const ob::State *state, int active_chain, int
 	case 0:
 		if (calc_specific_IK_solution_R1(Q, q1, IK_sol)) {
 			State q_IK = get_IK_solution_q2();
-			if (!withObs || !collision_state(P, q1, q_IK))
+			if (!withObs || !collision_state(q1, q_IK))
 				return true;
 		}
 		else
@@ -379,7 +379,7 @@ bool StateValidityChecker::isValid(const ob::State *state, int active_chain, int
 	case 1:
 		if (calc_specific_IK_solution_R2(Q, q2, IK_sol)) {
 			State q_IK = get_IK_solution_q1();
-			if (!withObs || !collision_state(P, q_IK, q2))
+			if (!withObs || !collision_state(q_IK, q2))
 				return true;
 		}
 		else
@@ -461,7 +461,7 @@ bool StateValidityChecker::isValidRBS(State &q1, State &q2, int active_chain, in
 	if (!IKproject(q1, q2, active_chain, IK_sol))
 		return false;
 
-	if (!withObs || !collision_state(P, q1, q2))
+	if (!withObs || !collision_state(q1, q2))
 		return true;
 
 	return false;

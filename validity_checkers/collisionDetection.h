@@ -12,20 +12,23 @@
 #include <string>
 #include <vector>
 
+#include "../proj_classes/def.h"
+
 typedef std::vector<std::vector< double > > Matrix;
 typedef std::vector< double > State;
-
 
 class collisionDetection
 {
 public:
 
 	double offsetX, offsetY, offsetZ, offsetRot;
-	collisionDetection(double,double,double,double,int = 1);
+	collisionDetection();
 	void load_models();
-	int collision_state(Matrix M, State q1, State q2);
+	int collision_state(State);
+	int collision_state(State, State);
 	PQP_Model base, link1, link2, link3, link4, link5, link6, EE, table, obs1, obs2, obs3;
-	PQP_Model base2, link12, link22, link32, link42, link52, link62, EE2, rod;
+	PQP_Model base2, link12, link22, link32, link42, link52, link62, EE2;
+	PQP_Model chassis, box, b1, b2, conveyor;
 
 	// Performance parameters
 	int collisionCheck_counter;

@@ -46,7 +46,7 @@ int sim_velocity;
 
 PQP_REAL R02[3][3],R12[3][3],R22[3][3],T02[3],T12[3],T22[3];
 PQP_REAL R32[3][3],R42[3][3],R52[3][3],T32[3],T42[3],T52[5];
-PQP_REAL R62[3][3],R72[3][3],T62[3],T72[3],T2_t2[3];
+PQP_REAL R62[3][3],R72[3][3],T62[3],T72[3],T2_t2[3], Tbox[3];
 
 PQP_REAL M02[3][3],M12[3][3],M22[3][3],M32[3][3],M42[3][3];
 PQP_REAL M52[3][3],M62[3][3],M72[3][3];
@@ -411,22 +411,23 @@ void DisplayCB()
 	T2[1] =  0;
 	T2[2] =  300;
 
-	MRotY(Mbox,-3.1416/2);  //link 6 rotate X
+	MRotY(Mbox,-3.1416/2);
 	MxM(Rbox,R7,Mbox);
 	MxV(Tt,R6,T2);
-	VpV(T7,T6,Tt);
+	VpV(Tbox,T6,Tt);
 
 	if(visualizeRobots == 1){
 		glColor3d(0.6235,0.9529,0.7569);//.5,.5);
-		MVtoOGL(oglm,Rbox,T7);
+		MVtoOGL(oglm,Rbox,Tbox);
 		glPushMatrix();
 		glMultMatrixd(oglm);
 		box_to_draw->Draw();
 		glPopMatrix();
 	}
 
-	// pm(R7, "R7");
-	// pv(T7, "T7");
+	// pm(Rbox, "Rbox");
+	// pv(Tbox, "Tbox");
+	
 
 	//ROBOT 2
 
@@ -479,8 +480,8 @@ void DisplayCB()
 	T12[1] =  0;
 	T12[2] =  344;
 
-	MxV(T12,R02,T12);
-	VpV(T12,T02,T12);
+	MxV(Tt,R02,T12);
+	VpV(T12,T02,Tt);
 
 	if(visualizeRobots == 1){
 		glColor3d(ROBOT_COLOR);
@@ -604,7 +605,7 @@ void DisplayCB()
 		glPopMatrix();
 	}
 
-	// pm(R62, "R62");
+	// pm(R72, "R72");
 	// pv(T72, "T72");
 
 	// Environment I
@@ -1188,7 +1189,7 @@ void load_models(){
 			b2.EndModel();
 			fclose(fp);
 
-			// initialize obs3
+			// initialize conveyor
 			conveyor_to_draw = new Model("conveyor.tris");
 
 			fp = fopen("conveyor.tris","r");
