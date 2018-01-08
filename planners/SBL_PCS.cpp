@@ -197,10 +197,9 @@ ompl::base::PlannerStatus ompl::geometric::SBL::solve(const base::PlannerTermina
 		IK_counter++;
 		clock_t sT = clock();
 		retrieveStateVector(xstate, q1, q2);
-		Matrix T = getQ();
 		if (!active_chain) {
-			if (!calc_specific_IK_solution_R1(T, q1, existing->ik_q1_active)) {
-				if (!calc_specific_IK_solution_R2(T, q2, existing->ik_q2_active)) {
+			if (!calc_specific_IK_solution_R1(q1, existing->ik_q1_active)) {
+				if (!calc_specific_IK_solution_R2(q2, existing->ik_q2_active)) {
 					sampling_time += double(clock() - sT) / CLOCKS_PER_SEC;
 					sampling_counter[1]++;
 					continue;
@@ -215,8 +214,8 @@ ompl::base::PlannerStatus ompl::geometric::SBL::solve(const base::PlannerTermina
 			}
 		}
 		else {
-			if (!calc_specific_IK_solution_R2(T, q2, existing->ik_q2_active)) {
-				if (!calc_specific_IK_solution_R1(T, q1, existing->ik_q1_active)) {
+			if (!calc_specific_IK_solution_R2(q2, existing->ik_q2_active)) {
+				if (!calc_specific_IK_solution_R1(q1, existing->ik_q1_active)) {
 					sampling_time += double(clock() - sT) / CLOCKS_PER_SEC;
 					sampling_counter[1]++;
 					continue;

@@ -13,7 +13,7 @@ two_robots::two_robots() {
 	lee = 400.7+22; 
 
 	initMatrix(Q, 4, 4);
-	Q = {{0,0,-1,435/2},{0,1,0,0},{1,0,0,300+450},{0,0,0,1}}; // Rod transformation from one end-tip to the other
+	Q = {{0,0,-1,250},{0,1,0,0},{1,0,0,300+450},{0,0,0,1}}; // Box transformation from one end-tip to the other
 
 	// Joint limits
 	q1minmax = deg2rad(180);
@@ -370,12 +370,11 @@ double two_robots::normDistance(State q_a, State q_b) {
 
 // Compute a specific IK solution when q1 is the active chain
 // Checks that IK exists for Robot 2
-bool two_robots::calc_specific_IK_solution_R1(Matrix T, State q1, int IKsol) {
-	// T - Trans. matrix for the end of the rod while its start is at the origin
+bool two_robots::calc_specific_IK_solution_R1(State q1, int IKsol) {
 	// q - angles of robot 1.
 
 	FKsolve_rob(q1, 1);
-	T2 = MatricesMult(get_FK_solution_T1(), T); // Returns the opposing required matrix of the rods tip at robot 2
+	T2 = MatricesMult(get_FK_solution_T1(), Q); // Returns the opposing required matrix of the rods tip at robot 2
 	T2 = MatricesMult(T2, {{-1, 0, 0, 0}, {0, -1, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}}); // Returns the REQUIRED matrix of the rods tip at robot 2
 
 	bool result = false;
@@ -387,12 +386,11 @@ bool two_robots::calc_specific_IK_solution_R1(Matrix T, State q1, int IKsol) {
 
 // Compute a specific IK solution when q2 is the active chain
 // Checks that IK exists for Robot 1
-bool two_robots::calc_specific_IK_solution_R2(Matrix T, State q2, int IKsol) {
-	// T - Trans. matrix for the end of the rod while its start is in the origin
+bool two_robots::calc_specific_IK_solution_R2(State q2, int IKsol) {
 	// q - angles of robot 1.
 
-	Matrix Tinv = T;
-	InvertMatrix(T, Tinv); // Invert matrix
+	Matrix Tinv = Q;
+	InvertMatrix(Q, Tinv); // Invert matrix
 
 	FKsolve_rob(q2, 2);
 	T1 = MatricesMult(get_FK_solution_T2(), {{-1, 0, 0, 0}, {0, -1, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}}); // Returns the opposing required matrix of the rods tip at robot 2
@@ -407,12 +405,11 @@ bool two_robots::calc_specific_IK_solution_R2(Matrix T, State q2, int IKsol) {
 
 // Check the feasibility of the state with no other information
 // Checks that IK exists for the IK solution of Robot 1
-bool two_robots::IsRobotsFeasible_R1(Matrix T, State q) {
-	// T - Trans. matrix for the end of the rod while its start is in the origin
+bool two_robots::IsRobotsFeasible_R1(State q) {
 	// q - angles of robot 1.
 
 	FKsolve_rob(q, 1);
-	T2 = MatricesMult(get_FK_solution_T1(), T); // Returns the opposing required matrix of the rods tip at robot 2
+	T2 = MatricesMult(get_FK_solution_T1(), Q); // Returns the opposing required matrix of the rods tip at robot 2
 	T2 = MatricesMult(T2, {{-1, 0, 0, 0}, {0, -1, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}}); // Returns the REQUIRED matrix of the rods tip at robot 2
 
 	countSolutions = calc_all_IK_solutions_2(T2);
@@ -425,13 +422,13 @@ bool two_robots::IsRobotsFeasible_R1(Matrix T, State q) {
 
 // Check the feasibility of the state with no other information
 // Checks that IK exists for the FK solution of Robot 2
-bool two_robots::IsRobotsFeasible_R2(Matrix T, State q) {
+bool two_robots::IsRobotsFeasible_R2(State q) {
 	// T - Trans. matrix for the end of the rod while its start is in the origin
 	// q - angles of robot 2.
 
 	FKsolve_rob(q, 2);
 	T1 = MatricesMult(get_FK_solution_T2(), {{-1, 0, 0, 0}, {0, -1, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}}); // Returns the opposing required matrix of the rods tip at robot 2
-	T1 = MatricesMult(T1, T); // Returns the REQUIRED matrix of the rods tip at rob
+	T1 = MatricesMult(T1, Q); // Returns the REQUIRED matrix of the rods tip at rob
 
 	countSolutions = calc_all_IK_solutions_1(T1);
 	if (countSolutions >= 1)

@@ -181,14 +181,13 @@ ompl::base::PlannerStatus ompl::geometric::RRT::solve(const base::PlannerTermina
 		// If not goal, then must project
 		if (!(gg && reach)) {
 			retrieveStateVector(dstate, q1, q2);
-			Matrix T = getQ();
 
 			ik = {-1, -1};
 
 			// Project dstate (currently not on the manifold)
 			if (!active_chain) {
-				if (!calc_specific_IK_solution_R1(T, q1, nmotion->ik_q1_active)) {
-					if (!calc_specific_IK_solution_R2(T, q2, nmotion->ik_q2_active))
+				if (!calc_specific_IK_solution_R1(q1, nmotion->ik_q1_active)) {
+					if (!calc_specific_IK_solution_R2(q2, nmotion->ik_q2_active))
 						continue;
 					active_chain = !active_chain;
 					q1 = get_IK_solution_q1();
@@ -200,8 +199,8 @@ ompl::base::PlannerStatus ompl::geometric::RRT::solve(const base::PlannerTermina
 				}
 			}
 			else {
-				if (!calc_specific_IK_solution_R2(T, q2, nmotion->ik_q2_active)) {
-					if (!calc_specific_IK_solution_R1(T, q1, nmotion->ik_q1_active))
+				if (!calc_specific_IK_solution_R2(q2, nmotion->ik_q2_active)) {
+					if (!calc_specific_IK_solution_R1(q1, nmotion->ik_q1_active))
 						continue;
 					active_chain = !active_chain;
 					q2 = get_IK_solution_q2();

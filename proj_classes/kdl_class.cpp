@@ -1,17 +1,19 @@
 #include "kdl_class.h"
 
 // Constructor for the robots
-kdl::kdl(double D, double rod_L) {
+kdl::kdl() {
 	b = 344; // Height of base
-	l1x = 525; 
+	l1x = 524.5; 
 	l1z = 199;
 	l2 = 1250; 
 	l3x = 186.5; 
 	l3z = 210; 
 	l4 = 1250; 
 	l5 = 116.5; 
-	lee = 50; 
-	L = rod_L;
+	lee = 400.7+22;
+
+	initMatrix(Q, 4, 4);
+	Q = {{0,0,-1,250},{0,1,0,0},{1,0,0,300+450},{0,0,0,1}}; // Box transformation from one end-tip to the other
 
 	// Joint limits
 	q1minmax = deg2rad(180);
@@ -26,7 +28,7 @@ kdl::kdl(double D, double rod_L) {
 	initMatrix(T_fk, 4, 4);
 
 	initMatrix(T_pose, 4, 4);
-	T_pose = {{1, 0, 0, D}, {0, 1, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}};
+	T_pose = {{0, -1, 0, ROBOTS_DISTANCE_X}, {1, 0, 0, ROBOTS_DISTANCE_Y}, {0, 0, 1, ROBOT2_HEIGHT-ROBOT1_HEIGHT}, {0, 0, 0, 1}};
 
 	//Definition of a kinematic chain & add segments to the chain
 	// Robot 1
@@ -36,8 +38,13 @@ kdl::kdl(double D, double rod_L) {
 	chain.addSegment(Segment(Joint(Joint::RotY),Frame(Vector(l3x,0.0,l3z)))); // Link 3
 	chain.addSegment(Segment(Joint(Joint::RotX),Frame(Vector(l4,0.0,0.0)))); // Link 4
 	chain.addSegment(Segment(Joint(Joint::RotY),Frame(Vector(l5,0.0,0.0)))); // Link 5
-	chain.addSegment(Segment(Joint(Joint::RotX),Frame(Vector(2*lee+L,0.0,0.0)))); // Rod + 2 EE
+	chain.addSegment(Segment(Joint(Joint::RotX),Frame(Vector(lee,0.0,0.0)))); // EE
+	// Box
+	Rotation r( Q[0][0],Q[0][1],Q[0][2], Q[1][0],Q[1][1],Q[1][2], Q[2][0],Q[2][1],Q[2][2] );
+	chain.addSegment(Segment(Joint(Joint::None),Frame(Vector(Q[0][3],Q[1][3],Q[2][3])))); // Box translation
+	chain.addSegment(Segment(Joint(Joint::None),Frame(r))); // Box rotation
 	// Robot 2 - backwards
+	chain.addSegment(Segment(Joint(Joint::None),Frame(Vector(lee,0.0,0.0)))); // Box translation	
 	chain.addSegment(Segment(Joint(Joint::RotX),Frame(Vector(l5,0.0,0.0)))); // Link 5
 	chain.addSegment(Segment(Joint(Joint::RotY),Frame(Vector(l4,0.0,0.0)))); // Link 4
 	chain.addSegment(Segment(Joint(Joint::RotX),Frame(Vector(l3x,0.0,-l3z)))); // Link 3 "-"

@@ -53,7 +53,7 @@ void StateValidityChecker::printStateVector(const ob::State *state) {
 State StateValidityChecker::sample_q() {
 	// c is a 12 dimensional vector composed of [q1 q2]
 
-	State q(12), q1(6), q2(6);
+	State q(12);
 
 	clock_t sT = clock();
 	while (1) {
@@ -67,8 +67,7 @@ State StateValidityChecker::sample_q() {
 
 		q = get_GD_result();
 
-		seperate_Vector(q, q1, q2);
-		if ( withObs && (collision_state(P, q1, q2) || !check_angle_limits(q)) )  {
+		if ( withObs && (collision_state(q) || !check_angle_limits(q)) )  {
 			sampling_counter[1]++;
 			continue;
 		}
@@ -100,10 +99,7 @@ bool StateValidityChecker::IKproject(State &q, bool includeObs) {
 
 	q = get_GD_result();
 
-	State q1(6), q2(6);
-
-	seperate_Vector(q, q1, q2);
-	if (includeObs && withObs && collision_state(P, q1, q2))
+	if (includeObs && withObs && collision_state(q))
 		return false;
 
 	return true;
@@ -116,7 +112,7 @@ bool StateValidityChecker::isValid(const ob::State *state) {
 
 	isValid_counter++;
 
-	State q(12), q1(6), q2(6);
+	State q(12);
 	retrieveStateVector(state, q);
 
 	if (!GD(q))
@@ -124,8 +120,7 @@ bool StateValidityChecker::isValid(const ob::State *state) {
 
 	q = get_GD_result();
 
-	seperate_Vector(q, q1, q2);
-	if (withObs && collision_state(P, q1, q2))
+	if (withObs && collision_state(q))
 		return false;
 
 	updateStateVector(state, q);
@@ -187,9 +182,7 @@ bool StateValidityChecker::isValidRBS(State &q) {
 
 	q = get_GD_result();
 
-	State q1(6), q2(6);
-	seperate_Vector(q, q1, q2);
-	if (withObs && collision_state(P, q1, q2))
+	if (withObs && collision_state(q))
 		return false;
 
 	return true;
@@ -299,15 +292,12 @@ bool StateValidityChecker::isValidSew(State& q) {
 
 	isValid_counter++;
 
-	State q1(6), q2(6);
-
 	if (!GD(q))
 		return false;
 
 	q = get_GD_result();
 
-	seperate_Vector(q, q1, q2);
-	if (withObs && collision_state(P, q1, q2))
+	if (withObs && collision_state(q))
 		return false;
 
 	return true;

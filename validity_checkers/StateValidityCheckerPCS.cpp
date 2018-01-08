@@ -99,8 +99,8 @@ bool StateValidityChecker::IKproject(State &q1, State &q2, State &ik, int &activ
 	clock_t sT = clock();
 
 	if (!active_chain) {
-		if (!calc_specific_IK_solution_R1(Q, q1, ik_nn[0])) {
-			if (!calc_specific_IK_solution_R2(Q, q2, ik_nn[1]))
+		if (!calc_specific_IK_solution_R1(q1, ik_nn[0])) {
+			if (!calc_specific_IK_solution_R2(q2, ik_nn[1]))
 				valid = false;
 			else {
 				active_chain = !active_chain;
@@ -114,8 +114,8 @@ bool StateValidityChecker::IKproject(State &q1, State &q2, State &ik, int &activ
 		}
 	}
 	else {
-		if (!calc_specific_IK_solution_R2(Q, q2, ik_nn[0])) {
-			if (!calc_specific_IK_solution_R1(Q, q1, ik_nn[1]))
+		if (!calc_specific_IK_solution_R2(q2, ik_nn[0])) {
+			if (!calc_specific_IK_solution_R1(q1, ik_nn[1]))
 				valid = false;
 			else {
 				active_chain = !active_chain;
@@ -144,13 +144,13 @@ bool StateValidityChecker::IKproject(State &q1, State &q2, int active_chain, int
 	clock_t sT = clock();
 
 	if (!active_chain) {
-		if (calc_specific_IK_solution_R1(Q, q1, ik_sol))
+		if (calc_specific_IK_solution_R1(q1, ik_sol))
 			q2 = get_IK_solution_q2();
 		else
 			valid = false;
 	}
 	else {
-		if (calc_specific_IK_solution_R2(Q, q2, ik_sol))
+		if (calc_specific_IK_solution_R2(q2, ik_sol))
 			q1 = get_IK_solution_q1();
 		else
 			valid = false;
@@ -171,13 +171,13 @@ bool StateValidityChecker::IKproject(State &q1, State &q2, int active_chain) {
 
 	for (i = 0; i < IKsol.size(); i++) {
 		if (!active_chain) {
-			if (calc_specific_IK_solution_R1(Q, q1, IKsol[i]))
+			if (calc_specific_IK_solution_R1(q1, IKsol[i]))
 				q2 = get_IK_solution_q2();
 			else
 				continue;
 		}
 		else {
-			if (calc_specific_IK_solution_R2(Q, q2, IKsol[i]))
+			if (calc_specific_IK_solution_R2(q2, IKsol[i]))
 				q1 = get_IK_solution_q1();
 			else
 				continue;
@@ -205,7 +205,7 @@ bool StateValidityChecker::sample_q(ob::State *st) {
 
 		int ik_sol = rand() % 8;
 
-		if (calc_specific_IK_solution_R1(Q, q1, ik_sol))
+		if (calc_specific_IK_solution_R1(q1, ik_sol))
 			q2 = get_IK_solution_q2();
 
 		ik = identify_state_ik(q1, q2);
@@ -241,7 +241,7 @@ State StateValidityChecker::sample_q() {
 
 		int ik_sol = rand() % 8;
 
-		if (calc_specific_IK_solution_R1(Q, q1, ik_sol)) 
+		if (calc_specific_IK_solution_R1(q1, ik_sol)) 
 			q2 = get_IK_solution_q2();
 		else
 			continue;
@@ -331,7 +331,7 @@ bool StateValidityChecker::isValid(const ob::State *state) {
 	ik = identify_state_ik(state);
 
 	// q1 is the active chain
-	if (calc_specific_IK_solution_R1(Q, q1, ik[0])) {
+	if (calc_specific_IK_solution_R1(q1, ik[0])) {
 		State q_IK = get_IK_solution_q2();
 		if (normDistance(q2, q_IK) > 0.5e-1)
 			return false;
@@ -342,7 +342,7 @@ bool StateValidityChecker::isValid(const ob::State *state) {
 		return false;
 
 	// q2 is the active chain
-	if (calc_specific_IK_solution_R2(Q, q2, ik[1])) {
+	if (calc_specific_IK_solution_R2(q2, ik[1])) {
 		State q_IK = get_IK_solution_q1();
 		if (normDistance(q1, q_IK) > 0.12)
 			return false;
@@ -368,7 +368,7 @@ bool StateValidityChecker::isValid(const ob::State *state, int active_chain, int
 
 	switch (active_chain) {
 	case 0:
-		if (calc_specific_IK_solution_R1(Q, q1, IK_sol)) {
+		if (calc_specific_IK_solution_R1(q1, IK_sol)) {
 			State q_IK = get_IK_solution_q2();
 			if (!withObs || !collision_state(q1, q_IK))
 				return true;
@@ -377,7 +377,7 @@ bool StateValidityChecker::isValid(const ob::State *state, int active_chain, int
 			return false;
 		break;
 	case 1:
-		if (calc_specific_IK_solution_R2(Q, q2, IK_sol)) {
+		if (calc_specific_IK_solution_R2(q2, IK_sol)) {
 			State q_IK = get_IK_solution_q1();
 			if (!withObs || !collision_state(q_IK, q2))
 				return true;

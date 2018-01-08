@@ -4,9 +4,6 @@
 #include <stdlib.h>
 #include <fstream>
 
-#define ROBOTS_DISTANCE 4000
-#define ROD_LENGTH 1000
-
 double fRand(double fMin, double fMax)
 {
 	double f = (double)rand() / RAND_MAX;
@@ -20,7 +17,7 @@ int main() {
 	cout << "Seed in testing: " << Seed << endl;
 
 	// KDL
-	kdl K(ROBOTS_DISTANCE, ROD_LENGTH);
+	kdl K;
 
 
 	int N = 1;

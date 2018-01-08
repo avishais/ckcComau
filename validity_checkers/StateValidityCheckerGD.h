@@ -20,11 +20,6 @@
 
 #include <iostream>
 
-#define ROBOTS_DISTANCE_ENV_I 4000
-#define ROD_LENGTH_ENV_I 500
-#define ROBOTS_DISTANCE_ENV_II 1200
-#define ROD_LENGTH_ENV_II 500
-
 namespace ob = ompl::base;
 using namespace std;
 
@@ -32,23 +27,14 @@ class StateValidityChecker : public collisionDetection, public kdl
 {
 public:
 	/** Constructors */
-	StateValidityChecker(const ob::SpaceInformationPtr &si, int env = 1) :
-		mysi_(si.get()),
-		kdl(env==1 ? ROBOTS_DISTANCE_ENV_I : ROBOTS_DISTANCE_ENV_II, env==1 ? ROD_LENGTH_ENV_I : ROD_LENGTH_ENV_II),
-		collisionDetection(env==1 ? ROBOTS_DISTANCE_ENV_I : ROBOTS_DISTANCE_ENV_II,0,0,0,env)
-			{L = env==1 ? ROD_LENGTH_ENV_I : ROD_LENGTH_ENV_II;
+	StateValidityChecker(const ob::SpaceInformationPtr &si, int env = 1) : mysi_(si.get())
+			{
 			q_prev.resize(12);
-			setQ();
-			setP();
 			initiate_log_parameters();
 			}; //Constructor
-	StateValidityChecker(int env = 1) :
-		kdl(env==1 ? ROBOTS_DISTANCE_ENV_I : ROBOTS_DISTANCE_ENV_II, env==1 ? ROD_LENGTH_ENV_I : ROD_LENGTH_ENV_II),
-		collisionDetection(env==1 ? ROBOTS_DISTANCE_ENV_I : ROBOTS_DISTANCE_ENV_II,0,0,0,env)
-			{L = env==1 ? ROD_LENGTH_ENV_I : ROD_LENGTH_ENV_II;
+	StateValidityChecker(int env = 1)
+			{
 			q_prev.resize(12);
-			setQ();
-			setP();
 			initiate_log_parameters();
 			}; //Constructor
 
@@ -114,41 +100,6 @@ public:
 		return valid_solution_index;
 	}
 
-	/** Return matrix of coordinated along the rod (in rod coordinate frame) */
-	Matrix getPMatrix() {
-		return P;
-	}
-
-	/** Return transformation matrix of rod end-tip in rod coordinate frame (at the other end-point) */
-	Matrix getQ() {
-		return Q;
-	}
-
-	/** Set transformation matrix of rod end-tip in rod coordinate frame (at the other end-point) */
-	void setQ() {
-		State v(4);
-
-		v = {1,0,0,L};
-		Q.push_back(v);
-		v = {0,1,0,0};
-		Q.push_back(v);
-		v = {0,0,1,0};
-		Q.push_back(v);
-		v = {0,0,0,1};
-		Q.push_back(v);
-	}
-
-	/** Set matrix of coordinated along the rod (in rod coordinate frame) */
-	void setP() {
-		State v(3);
-		int dl = 20;
-		int n = L / dl;
-		for (int i = 0; i <= n; i++) {
-			v = {(double)i*dl,0,0};
-			P.push_back(v);
-		}
-	}
-
 	/** Performance parameters measured during the planning */
 	int isValid_counter;
 	int get_isValid_counter() {
@@ -212,10 +163,6 @@ private:
 	ob::SpaceInformation    *mysi_;
 	int valid_solution_index;
 	State q_prev;
-
-	double L;
-	Matrix Q;
-	Matrix P;
 
 	double dq = 0.05; // Serial local connection resolution
 	bool withObs = true; // Include obstacles?

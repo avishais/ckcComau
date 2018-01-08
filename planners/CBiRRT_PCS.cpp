@@ -190,7 +190,6 @@ ompl::geometric::CBiRRT::Motion* ompl::geometric::CBiRRT::growTree(TreeData &tre
 		// If trying to reach a point that does not satisfy the closure constraint - needs to be projected
 		if (mode==1 || !reach) { // equivalent to (!(mode==2 && reach))
 			retrieveStateVector(dstate, q1, q2);
-			Matrix T = getQ();
 
 			ik = {-1, -1};
 
@@ -198,8 +197,8 @@ ompl::geometric::CBiRRT::Motion* ompl::geometric::CBiRRT::growTree(TreeData &tre
 			clock_t sT = clock();
 			// Project dstate (currently not on the manifold)
 			if (!active_chain) {
-				if (!calc_specific_IK_solution_R1(T, q1, nmotion->ik_q1_active)) {
-					if (!calc_specific_IK_solution_R2(T, q2, nmotion->ik_q2_active)) {
+				if (!calc_specific_IK_solution_R1(q1, nmotion->ik_q1_active)) {
+					if (!calc_specific_IK_solution_R2(q2, nmotion->ik_q2_active)) {
 						sampling_time += double(clock() - sT) / CLOCKS_PER_SEC;
 						sampling_counter[1]++;
 						return nmotion;
@@ -214,8 +213,8 @@ ompl::geometric::CBiRRT::Motion* ompl::geometric::CBiRRT::growTree(TreeData &tre
 				}
 			}
 			else {
-				if (!calc_specific_IK_solution_R2(T, q2, nmotion->ik_q2_active)) {
-					if (!calc_specific_IK_solution_R1(T, q1, nmotion->ik_q1_active)) {
+				if (!calc_specific_IK_solution_R2(q2, nmotion->ik_q2_active)) {
+					if (!calc_specific_IK_solution_R1(q1, nmotion->ik_q1_active)) {
 						sampling_time += double(clock() - sT) / CLOCKS_PER_SEC;
 						sampling_counter[1]++;
 						return nmotion;

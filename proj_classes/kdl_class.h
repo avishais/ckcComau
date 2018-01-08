@@ -21,6 +21,8 @@
 #include <vector>
 #include <math.h>
 
+#include "def.h"
+
 #define PI 3.1416
 
 using namespace std;
@@ -45,7 +47,7 @@ private:
 
 public:
 	// Constructor
-	kdl(double, double);
+	kdl();
 
 	/** KDL declarations */
 	KDL::Chain chain;
@@ -79,6 +81,11 @@ public:
 
 	/** Log conf. to path.txt file */
 	void log_q(State q);
+
+	Matrix Q;
+	Matrix getQ() {
+		return Q;
+	}
 
 	/** Returns ABB's link lengths */
 	State get_robots_properties() {

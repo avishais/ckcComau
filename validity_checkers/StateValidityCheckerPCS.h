@@ -30,11 +30,9 @@ public:
 	StateValidityChecker(const ob::SpaceInformationPtr &si, int env = 1) : mysi_(si.get())
 			{
 			q_temp.resize(6);
-			setQ();
 			}; //Constructor
 	StateValidityChecker(int env = 1) {
 			q_temp.resize(6);
-			setQ();
 			}; //Constructor
 
 	/** Validity check using standard OMPL */
@@ -109,20 +107,6 @@ public:
 		return valid_solution_index;
 	}
 
-	/** Return transformation matrix of rod end-tip in rod coordinate frame (at the other end-point) */
-	Matrix getQ() {
-		return Q;
-	}
-
-	/** Set transformation matrix of rod end-tip in rod coordinate frame (at the other end-point) */
-	void setQ() {
-
-		Q.push_back({0,0,-1,250});
-		Q.push_back({0,1,0,0});
-		Q.push_back({1, 0, 0, 300+450});
-		Q.push_back({0, 0, 0, 1});
-	}
-
 	/** Performance parameters measured during the planning */
 	int isValid_counter;
 	int get_isValid_counter() {
@@ -178,7 +162,6 @@ private:
 	int valid_solution_index;
 
 	double L;
-	Matrix Q;
 
 	bool withObs = true; // Include obstacles?
 	double RBS_tol = 0.05; // RBS local connection resolution

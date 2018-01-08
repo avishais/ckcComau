@@ -62,12 +62,12 @@ public:
 	State get_IK_solution_q1();
 	State get_IK_solution_q2();
 	int get_countSolutions();
-	bool calc_specific_IK_solution_R1(Matrix, State, int);
-	bool calc_specific_IK_solution_R2(Matrix, State, int);
+	bool calc_specific_IK_solution_R1(State, int);
+	bool calc_specific_IK_solution_R2(State, int);
 
 	/** Is robots configurations feasible? */
-	bool IsRobotsFeasible_R1(Matrix, State);
-	bool IsRobotsFeasible_R2(Matrix, State);
+	bool IsRobotsFeasible_R1(State);
+	bool IsRobotsFeasible_R2(State);
 	int calc_all_IK_solutions_1(Matrix);
 	int calc_all_IK_solutions_2(Matrix);
 
@@ -95,10 +95,6 @@ public:
 	void log_q(State);
 
 	Matrix Q;
-	Matrix P;
-	Matrix getPMatrix() {
-		return P;
-	}
 	Matrix getQ() {
 		return Q;
 	}
