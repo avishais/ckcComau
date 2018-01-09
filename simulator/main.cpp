@@ -60,8 +60,9 @@ void execute_path(int);
 
 int mode;
 double beginx, beginy;
-double dis = 7000.0, azim = 180.0, elev = 120.0;
+double dis = 7000.0, azim = 0.0, elev = 0.0, azim2 = 0;
 double ddis = 700.0, dazim = 0.0, delev = 0.0;
+double panx = 0.0, pany = 0.0;
 double rot1 = 0.0, rot2 = 0.0, rot3 = 0.0;  //in radians
 double rot4 = 0.0, rot5 = 0.0, rot6 = 0.0;
 double rot12 = 0.0, rot22 = 0.0, rot32 = 0.0;  //in radians
@@ -91,6 +92,39 @@ void pv(const PQP_REAL V[3], std::string str) {
 	for (int i = 0; i < 3; i++)
 		std::cout << V[i] << " ";
 	std::cout << std::endl;
+}
+
+void PPMWriter(unsigned char *in,char *name,int dimx, int dimy)
+{
+ 
+  int i, j;
+  FILE *fp = fopen(name, "wb"); /* b - binary mode */
+  (void) fprintf(fp, "P6\n%d %d\n255\n", dimx, dimy);
+  for (j = 0; j < dimy; ++j)
+  {
+    for (i = 0; i < dimx; ++i)
+    {
+      static unsigned char color[3];
+      color[0] = in[3*i+3*j*dimy];  /* red */
+      color[1] = in[3*i+3*j*dimy+1];  /* green */
+      color[2] = in[3*i+3*j*dimy+2];  /* blue */
+      (void) fwrite(color, 1, 3, fp);
+    }
+  }
+  (void) fclose(fp);
+}
+ 
+void saveImage()
+{
+    unsigned char* image = (unsigned char*)malloc(sizeof(unsigned char) * 3 * 1024 * 1024);
+    glReadPixels(0, 0, 1024, 1024, GL_RGB, GL_UNSIGNED_BYTE, image);
+    // Warning : enregistre de bas en haut
+	char buffer [33];
+	double Ttime = time(NULL);
+	sprintf(buffer,"capture_%d.ppm",Ttime) ;
+	std::cout << "Image taken." << std::endl;
+  
+    PPMWriter(image,buffer,1024, 1024);
 }
 
 void InitViewerWindow()
@@ -157,6 +191,9 @@ void KeyboardCB(unsigned char key, int x, int y)
 		delete link6_to_draw;
 		delete EE_to_draw;
 		exit(0);
+	case 'o':
+		saveImage();
+		break;
 	case '1': rot1 += .1; break;
 	case '2': rot2 += .1; break;
 	case '3': rot3 += .1; break;
@@ -167,12 +204,48 @@ void KeyboardCB(unsigned char key, int x, int y)
 	case '8': rot22 += .1; break;
 	case '9': rot32 += .1; break;
 	case '0': rot42 += .1; break;
-	case '-': rot52 += .1; break;
+	//case '-': rot52 += .1; break;
 	case '=': rot62 += .1; break;
 	case 'r':
 		std::cout << "Updating path...\n";
 		step = 0;
 		glutTimerFunc(10, execute_path, 0);
+		break;
+	case 'a':
+		panx += 15;
+		break;
+	case 'd':
+		panx -= 15;
+		break;
+	case 'w':
+		pany -= 15;
+		break;
+	case 's':
+		pany += 15;
+		break;
+	case '[':
+		azim += 5;
+		break;
+	case ']':
+		azim -= 5;
+		break;
+	case ',':
+		elev -= 5;
+		break;
+	case '.':
+		elev += 5;
+		break;
+	case '/':
+		azim2 -= 5;
+		break;
+	case '*':
+		azim2 += 5;
+		break;
+	case '+':
+		dis += 15;
+		break;
+	case '-':
+		dis -= 15;
 		break;
 	}
 
@@ -229,9 +302,10 @@ void BeginDraw()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glLoadIdentity();
-	glTranslatef(0.0, 0.0, -(dis+ddis));
+	glTranslatef(panx, pany, -(dis+ddis));
 	glRotated(elev+delev, 1.0, 0.0, 0.0);
 	glRotated(azim+dazim, 0.0, 1.0, 0.0);
+	glRotated(azim2, 0.0, 0.0, 1.0);
 }
 
 void EndDraw()
@@ -633,7 +707,7 @@ void DisplayCB()
 		//MxM(R0,Mobs,Mobs);
 
 		Tobs[0] =  offsetX/2+100;
-		Tobs[1] =  200;
+		Tobs[1] =  250;
 		Tobs[2] =  0;
 
 		if(visualize == 1 && withObs) {
@@ -651,7 +725,7 @@ void DisplayCB()
 
 		Tobs[0] =  -offsetX/2;
 		Tobs[1] =  0;
-		Tobs[2] =  0;
+		Tobs[2] =  -30;
 
 		if(visualize == 1 && withObs) {
 			glColor3d(1.0,1.0,1.0);
@@ -668,7 +742,7 @@ void DisplayCB()
 
 		Tobs[0] =  offsetX/2;
 		Tobs[1] =  offsetY;
-		Tobs[2] =  0;
+		Tobs[2] =  -30;
 
 		if(visualize == 1 && withObs) {
 			glColor3d(1.0,1.0,1.0);
@@ -681,7 +755,7 @@ void DisplayCB()
 
 	}
 
-	Ti[0]=0;Ti[1]=0;Ti[2]=950;
+	
 	// if(visualize == 1){
 	// 	glColor3d(.93, .69, .13);//94.0/255,48.0/255,13.0/255);//0.0,0.0,1.0);//
 	// 	MVtoOGL(oglm,R0,Ti);
@@ -690,6 +764,8 @@ void DisplayCB()
 	// 	table_to_draw->Draw();
 	// 	glPopMatrix();
 	// }
+
+	// Ti[0]=1500;Ti[1]=-1500;Ti[2]=0;
 	// if(1 && visualize == 1){
 	// 	glColor3d(0.8,0.9,0.9);
 	// 	MVtoOGL(oglm,R0,Ti);
@@ -698,8 +774,9 @@ void DisplayCB()
 	// 	room_to_draw->Draw();
 	// 	glPopMatrix();
 	// }
+	Ti[0]=-6000;Ti[1]=1050;Ti[2]=-150;
 	if(visualize == 1){
-		glColor3d(1.0,1.0,0.7);
+		glColor3d(172./255,52./255,56./255);
 		MVtoOGL(oglm,R0,Ti);
 		glPushMatrix();
 		glMultMatrixd(oglm);
@@ -1266,13 +1343,12 @@ void execute_path(int k){
 	//std::cout << "Cong.: " << k << std::endl;
 
 	if(k == 0){
-		const char* rod_pfile = "../paths/rod.txt";
-		const char* robot_pfile = "../paths/path.txt";
+		const char* robot_pfile = "../paths/path1.txt";
 		FILE *fro, *fr;
 		int i, nlines;
 
 		fr = fopen(robot_pfile,"r");
-		if (fr == NULL) { fprintf(stderr,"Couldn't open robot_path.txt\n"); exit(-1); }
+		if (fr == NULL) { fprintf(stderr,"Couldn't open path.txt\n"); exit(-1); }
 		fscanf(fr,"%i",&nlines);  //NOT include number in line count itself
 		RoboStates.resize(nlines);
 

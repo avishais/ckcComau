@@ -53,26 +53,23 @@ int main() {
 
 	// 	A.printVector(A.get_IK_solution_q2());
 	// }
-
-	Matrix Q;
-	Q.push_back({0, 0, -1, 250});
-	Q.push_back({0, 1, 0, 0});
-	Q.push_back();
-    Q.push_back();
-    
+   
     State q(12);
     State q1(6), q2(6, 0);
     //c_start = {-0.04, 0.33, -0.05, 0, 1.2908, -1.6208, 0.00538822, 0.743805, -0.445341, -0.0157073, -0.298499, 0.0150128}; // On the conveyor  
     //c_goal = {1.57, 0.55, 0.73, 0, 0.2908, 0.0092, -1.19386, 1.0596, 0.00106656, -1.22915, -1.38548, 0.478077};  
-    q1 = {-0.05, 0.23, 0.05, 0, 1.2908, -1.6208};
-    q2 = {-0.0329241, 0.75768, -0.491455, -0.124554, -0.268206, 0.120145 };
+    //c_start = {-0.03, 0.33, -0.05, 0, 1.2908, -1.5808, 0.0183141, 1.06015, -1.25727, -0.193255, 0.200755, 0.189466};
+    //c_goal = {1.57, 0.55, 0.73, 0, 0.2908, 0.0092, -1.12171, 0.868895, -0.0134552, -1.21367, -1.2759, 0.661756};
+    q1 = {1.57, 0.55, 0.73, 0, 0.2908, 0.0092};
+    q2 = {-1.19386, 1.0596, 0.00106656, -1.22915, -1.38548, 0.478077};
     q = join(q1, q2);
     A.log_q(q);
     if (!A.check_angle_limits(q)) 
         cout << "Breach of joint limits!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
 
+    int ik_sol = 1;
 
-	double dq = 0.01;
+    double dq = 0.01;
 	while (1) {
 
         cout << "Move joints: ";
@@ -116,21 +113,31 @@ int main() {
             case 'y':
             q1[5] -= dq;
             break;
+            case '0':
+            if (ik_sol < 7)
+                ik_sol++;
+            cout << "ik_sol = " << ik_sol << endl;
+            break;
+            case 'p':
+            if (ik_sol > 0)
+                ik_sol--;
+            cout << "ik_sol = " << ik_sol << endl;
+            break;
             default:
             break;
         }
         cout << "q1: "; A.printVector(q1);
       
         bool flag;
-        for (int ik_sol = 0; ik_sol < 8; ik_sol++) {
-            flag = A.calc_specific_IK_solution_R1(Q, q1, ik_sol);
+        // for (int ik_sol = 0; ik_sol < 8; ik_sol++) {
+            flag = A.calc_specific_IK_solution_R1(q1, ik_sol);
             if (flag) {
                 cout << "IK success with IK solution #" << ik_sol << endl;
                 q2 = A.get_IK_solution_q2();
                 cout << "q2: "; A.printVector(q2);	
-                break;
+                // break;
             }
-        }
+        // }
         q = join(q1, q2);
         A.log_q(q);
         if (flag) {

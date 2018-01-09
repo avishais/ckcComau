@@ -82,8 +82,8 @@ void plan_C::plan(State c_start, State c_goal, double runtime, plannerType ptype
 	Qbounds.setHigh(0, PI_);
 	Qbounds.setLow(1, -1.0472);
 	Qbounds.setHigh(1, 2.1871);
-	Qbounds.setLow(2, -0.5236);
-	Qbounds.setHigh(2, 2.9671);
+	Qbounds.setLow(2, -PI_/2);
+	Qbounds.setHigh(2, 1.3090);
 	Qbounds.setLow(3, -PI_);
 	Qbounds.setHigh(3, PI_);
 	Qbounds.setLow(4, -2.0944);
@@ -94,8 +94,8 @@ void plan_C::plan(State c_start, State c_goal, double runtime, plannerType ptype
 	Qbounds.setHigh(6, PI_);
 	Qbounds.setLow(7, -1.0472);
 	Qbounds.setHigh(7, 2.1871);
-	Qbounds.setLow(8, -0.5236);
-	Qbounds.setHigh(8, 2.9671);
+	Qbounds.setLow(8, -PI_/2);
+	Qbounds.setHigh(8, 1.3090);
 	Qbounds.setLow(9, -PI_);
 	Qbounds.setHigh(9, PI_);
 	Qbounds.setLow(10, -2.0944);
@@ -209,11 +209,13 @@ int main(int argn, char ** args) {
 	if (argn == 1) {
 		runtime = 1; // sec
 		ptype = PLANNER_BIRRT;
+		plannerName = "BiRRT";
 		env = 1;
 	}
 	else if (argn == 2) {
 		runtime = atof(args[1]);
 		ptype = PLANNER_BIRRT;
+		plannerName = "BiRRT";
 		env = 1;
 	}
 	else if (argn > 2) {
@@ -247,15 +249,17 @@ int main(int argn, char ** args) {
 
 	State c_start, c_goal;
 	if (env == 1) {
-    	c_start = {-0.04, 0.33, -0.05, 0, 1.2908, -1.6208, 0.00538822, 0.743805, -0.445341, -0.0157073, -0.298499, 0.0150128}; // On the conveyor  
-		c_goal = {1.57, 0.55, 0.73, 0, 0.2908, 0.0092, -1.19386, 1.0596, 0.00106656, -1.22915, -1.38548, 0.478077};  // Mounted on the chassis
+    	//c_start = {-0.04, 0.33, -0.05, 0, 1.2908, -1.6208, 0.00538822, 0.743805, -0.445341, -0.0157073, -0.298499, 0.0150128}; // On the conveyor  
+		//c_goal = {1.57, 0.55, 0.73, 0, 0.2908, 0.0092, -1.19386, 1.0596, 0.00106656, -1.22915, -1.38548, 0.478077};  // Mounted on the chassis
+		c_start = {-0.03, 0.33, -0.05, 0, 1.2908, -1.5808, 0.0183141, 1.06015, -1.25727, -0.193255, 0.200755, 0.189466};
+		c_goal = {1.57, 0.55, 0.73, 0, 0.2908, 0.0092, -1.12171, 0.868895, -0.0134552, -1.21367, -1.2759, 0.661756};
 		Plan.set_environment(1);
 	}
 	else if (env == 2) {
 		Plan.set_environment(2);
 	}
 
-	int mode = 1;
+	int mode = 2;
 	switch (mode) {
 	case 1: {
 		// StateValidityChecker svc(1);
@@ -278,14 +282,14 @@ int main(int argn, char ** args) {
 	}
 	case 2 : { // Benchmark planning time with constant maximum step size
 		ofstream APS;
-		APS.open("/home/avishai/Downloads/omplapp/ompl/Workspace/ckc3d/matlab/profile/profile_" + plannerName + "_PCS_env2.txt", ios::app);
+		APS.open("./matlab/Benchmark_" + plannerName + "_PCS.txt", ios::app);
 
-		for (int k = 0; k < 100; k++) {
-			Plan.plan(c_start, c_goal, runtime, ptype, 0.6);
+		for (int k = 0; k < 500; k++) {
+			Plan.plan(c_start, c_goal, runtime, ptype, 0.2);
 
 			// Extract from perf file
 			ifstream FromFile;
-			FromFile.open("/home/avishai/Downloads/omplapp/ompl/Workspace/ckc3d/paths/perf_log.txt");
+			FromFile.open("./paths/perf_log.txt");
 			string line;
 			while (getline(FromFile, line))
 				APS << line << "\t";
@@ -297,15 +301,12 @@ int main(int argn, char ** args) {
 	}
 	case 3 : { // Benchmark maximum step size while benchmarking the step size
 		ofstream APS;
-		if (env == 1)
-			APS.open("/home/avishai/Downloads/omplapp/ompl/Workspace/ckc3d/matlab/Benchmark_" + plannerName + "_PCS_3poles_rB.txt", ios::app);
-		else if (env == 2)
-			APS.open("/home/avishai/Downloads/omplapp/ompl/Workspace/ckc3d/matlab/env2/Benchmark_" + plannerName + "_PCS_3poles_rB.txt", ios::app);
+		APS.open("./matlab/Benchmark_" + plannerName + "_PCS_rB.txt", ios::app);
 
 		int N = 250;
 		for (int k = 0; k < N; k++) {
-			for (int j = 0; j < 1; j++) {
-				double maxStep = 0;//.2 + 0.2*j;
+			for (int j = 0; j < 4; j++) {
+				double maxStep = 0.2 + 0.2*j;
 
 				cout << "** Running PCS iteration " << k << " with maximum step: " << maxStep << " **" << endl;
 
@@ -315,7 +316,7 @@ int main(int argn, char ** args) {
 
 				// Extract from perf file
 				ifstream FromFile;
-				FromFile.open("/home/avishai/Downloads/omplapp/ompl/Workspace/ckc3d/paths/perf_log.txt");
+				FromFile.open("./paths/perf_log.txt");
 				string line;
 				while (getline(FromFile, line))
 					APS << line << "\t";

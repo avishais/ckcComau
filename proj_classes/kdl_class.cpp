@@ -19,8 +19,8 @@ kdl::kdl() {
 	q1minmax = deg2rad(180);
 	q2max = deg2rad(125);
 	q2min = deg2rad(-60);
-	q3max = deg2rad(170);
-	q3min = deg2rad(-30);
+	q3max = deg2rad(75);
+	q3min = deg2rad(-90);
 	q4minmax = deg2rad(2700);
 	q5minmax = deg2rad(120);
 	q6minmax = deg2rad(400);

@@ -374,7 +374,7 @@ int collisionDetection::collision_state(State q1, State q2)
 		MRotZ(Robs,0);
 
 		Tobs[0] =  offsetX/2+100;
-		Tobs[1] =  200;
+		Tobs[1] =  250;
 		Tobs[2] =  0;
 		
 		PQP_Tolerance(&res[i],Robs,Tobs,&conveyor,R2,T2_t,&link2,tolerance); i++;
