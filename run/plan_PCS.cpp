@@ -259,10 +259,10 @@ int main(int argn, char ** args) {
 		Plan.set_environment(2);
 	}
 
-	int mode = 2;
+	int mode = 3;
 	switch (mode) {
 	case 1: {
-		// StateValidityChecker svc(1);
+		StateValidityChecker svc(1);
 		
 		// while (1) {
 		// 	State c_start = svc.sample_q();
@@ -272,7 +272,8 @@ int main(int argn, char ** args) {
 		// 	cout << svc.check_angle_limits(c_goal) << endl;
 		// 	//Plan.solved_bool = true;
 
-			Plan.plan(c_start, c_goal, runtime, ptype, 0.55);
+
+		Plan.plan(c_start, c_goal, runtime, ptype, 0.6);
 
 		// 	if (Plan.solved_bool)
 		// 		break;
@@ -301,14 +302,26 @@ int main(int argn, char ** args) {
 	}
 	case 3 : { // Benchmark maximum step size while benchmarking the step size
 		ofstream APS;
-		APS.open("./matlab/Benchmark_" + plannerName + "_PCS_rB.txt", ios::app);
+		APS.open("./matlab/Benchmark_" + plannerName + "_PCS_rBno.txt", ios::app);
 
-		int N = 250;
+		int N = 100;
 		for (int k = 0; k < N; k++) {
-			for (int j = 0; j < 4; j++) {
-				double maxStep = 0.2 + 0.2*j;
+			for (int j = 0; j < 6; j++) {
+				double maxStep = 0.2 + 0.4*j;
 
 				cout << "** Running PCS iteration " << k << " with maximum step: " << maxStep << " **" << endl;
+
+				StateValidityChecker svc(1);
+				svc.printVector(c_start);
+				svc.printVector(c_goal);
+				cout << svc.collision_state(c_start) << " " << svc.collision_state(c_goal) << endl;
+				// if (svc.collision_state(c_start) || svc.collision_state(c_goal)) {
+				// 	svc.two_robots::log_q(c_start);
+				// 	cout << "....\n";
+				// 	cin.ignore();
+				// 	svc.two_robots::log_q(c_goal);
+				// 	cin.ignore();
+				// }
 
 				Plan.plan(c_start, c_goal, runtime, ptype, maxStep);
 

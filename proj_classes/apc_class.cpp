@@ -641,7 +641,7 @@ Matrix two_robots::get_T2() {
 
 void two_robots::log_q(State q) {
 	std::ofstream myfile;
-	myfile.open("../paths/path.txt");
+	myfile.open("./paths/path.txt");
 
 	myfile << 1 << endl;
 

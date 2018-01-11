@@ -501,6 +501,12 @@ void DisplayCB()
 
 	// pm(Rbox, "Rbox");
 	// pv(Tbox, "Tbox");
+
+	// pm(Rbox, "Rbox");
+	// pv(Tbox, "Tbox");
+	// pm(R0, "R0");
+	// pv(T0, "T0");
+
 	
 
 	//ROBOT 2
@@ -603,7 +609,7 @@ void DisplayCB()
 	}
 
 	T22[0] =  186.5;
-	T22[1] =  186.8;
+	T22[1] =  183.5;
 	T22[2] =  210;
 
 	MxV(T42,R32,T22);
@@ -1343,7 +1349,7 @@ void execute_path(int k){
 	//std::cout << "Cong.: " << k << std::endl;
 
 	if(k == 0){
-		const char* robot_pfile = "../paths/path1.txt";
+		const char* robot_pfile = "../paths/path.txt";
 		FILE *fro, *fr;
 		int i, nlines;
 

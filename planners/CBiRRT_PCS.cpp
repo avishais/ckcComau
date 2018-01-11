@@ -329,7 +329,7 @@ ompl::base::PlannerStatus ompl::geometric::CBiRRT::solve(const base::PlannerTerm
 	{
 		ik = identify_state_ik(st);
 		retrieveStateVector(st, q1, q2);
-		if (ik[0]==-1 || ik[1] == -1 || collision_state(q1, q2)) {
+		if (ik[0]==-1 || ik[1] == -1){//} || collision_state(q1, q2)) {
 			OMPL_ERROR("%s: Start state not feasible!", getName().c_str());
 			return base::PlannerStatus::INVALID_START;
 		}
@@ -387,7 +387,7 @@ ompl::base::PlannerStatus ompl::geometric::CBiRRT::solve(const base::PlannerTerm
 			{
 				ik = identify_state_ik(st);
 				retrieveStateVector(st, q1, q2);
-				if (ik[0]==-1 || ik[1] == -1 || collision_state(q1, q2)) {
+				if (ik[0]==-1 || ik[1] == -1){//} || collision_state(q1, q2)) {
 					OMPL_ERROR("%s: Goal state not feasible!", getName().c_str());
 					return base::PlannerStatus::INVALID_START;
 				}

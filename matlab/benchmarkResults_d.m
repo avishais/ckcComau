@@ -11,8 +11,8 @@ planners = {'BiRRT','RRT'};
 plannerType = planners{1};
 switch plannerType
     case 'BiRRT'
-        D{1} = load('Benchmark_BiRRT_PCS_rB.txt'); D{1} = D{1}(D{1}(:,2)==1,:); 
-        D{2} = load('Benchmark_BiRRT_GD_rB.txt'); %D{2} = D{2}(D{2}(:,2)==1,:); 
+        D{1} = load('Benchmark_BiRRT_PCS_rBno.txt'); D{1} = D{1}(D{1}(:,2)==1,:); 
+        D{2} = load('Benchmark_BiRRT_GD_rBno.txt'); D{2} = D{2}(D{2}(:,2)==1,:); 
     case 'RRT'
         D{1} = load('Benchmark_RRT_envI_w_rB_2.txt'); 
         D{2} = load('Benchmark_RRT_envI_wo_rB.txt'); 
