@@ -7,18 +7,16 @@ clc
 
 d = 2.8;
 %%
-planners = {'BiRRT','RRT'};
-plannerType = planners{1};
+planners = {'BiRRT','RRT','SBL'};
+plannerType = planners{3};
 switch plannerType
     case 'BiRRT'
-        D{1} = load('Benchmark_BiRRT_PCS_rBno.txt'); D{1} = D{1}(D{1}(:,2)==1,:); 
-        D{2} = load('Benchmark_BiRRT_GD_rBno.txt'); D{2} = D{2}(D{2}(:,2)==1,:); 
+        D{1} = load('Benchmark_BiRRT_PCS_rB.txt'); D{1} = D{1}(D{1}(:,2)==1,:); 
+        D{2} = load('Benchmark_BiRRT_GD_rB.txt'); D{2} = D{2}(D{2}(:,2)==1,:); 
     case 'RRT'
-        D{1} = load('Benchmark_RRT_envI_w_rB_2.txt'); 
-        D{2} = load('Benchmark_RRT_envI_wo_rB.txt'); 
-        fprintf('Failures: \t%.1f, %.1f \n', 100-sum(D{1}(:,2))/size(D{1},1)*100, 100-sum(D{2}(:,2))/size(D{2},1)*100);
-        D{1} = D{1}(D{1}(:,2)==1,:); 
-        D{2} = D{2}(D{2}(:,2)==1,:); 
+    case 'SBL'
+        D{1} = load('Benchmark_SBL_PCS_rB.txt'); D{1} = D{1}(D{1}(:,2)==1,:); 
+        D{2} = load('Benchmark_SBL_GD_rB.txt'); D{2} = D{2}(D{2}(:,2)==1,:); 
 end
 
 %%
@@ -122,7 +120,7 @@ plot(T2,Mg*100,'--k','linewidth',2);
 hold off
 xlabel('maximum runtime (sec)');
 ylabel('failure rate (%)');
-legend('wPCA','woPCA');
+legend('PCS','NR');
 % xlim([0 1.2]);%max([T1 T2])]);
 % title(plannerType);
 set(gca,'fontsize',13);
