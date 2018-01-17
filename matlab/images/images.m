@@ -12,11 +12,11 @@ I1 = flipdim(I1, 2);
 I2 = flipdim(I2, 2);
 
 % % Environment III
-I1 = imcrop(I1, [1 70 992-1 840-70]);
-I2 = imcrop(I2, [1 70 992-1 840-70]);
+I1 = imcrop(I1, [1 70 992-1 800-70]);
+I2 = imcrop(I2, [1 70 992-1 800-70]);
 
-I1 = imresize(I1, [474 610]);
-I2 = imresize(I2, [474 610]);
+I1 = imresize(I1, [380 610]);
+I2 = imresize(I2, [380 610]);
 
 imshow(I1)
 %%
@@ -39,10 +39,10 @@ end
 
 I = [I1 I2];
 
-I = insertText(I,[0 -10],'(c)','FontSize',60,'BoxColor',...
+I = insertText(I,[0 -10],'(e)','FontSize',60,'BoxColor',...
     'w','BoxOpacity',0,'TextColor','black');
 
 imshow(I);
 
-imwrite(I, 'envIII.png');
+imwrite(I, 'envV.png');
 
