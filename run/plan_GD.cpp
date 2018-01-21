@@ -257,7 +257,7 @@ int main(int argn, char ** args) {
 		Plan.set_environment(2);
 	}
 
-	int mode = 2;
+	int mode = 3;
 	switch (mode) {
 	case 1: {
 		// StateValidityChecker svc(1);
@@ -298,10 +298,10 @@ int main(int argn, char ** args) {
 		if (env == 1)
 			GD.open("./matlab/Benchmark_" + plannerName + "_GD_rB.txt", ios::app);
 
-			for (int k = 0; k < 20; k++) {
+			for (int k = 0; k < 2; k++) {
 
-			for (int j = 0; j < 6; j++) {
-				double maxStep = 0.2 + 0.4*j;
+			for (int j = 0; j < 3; j++) {
+				double maxStep = 0.2 + 0.2*j;
 
 				cout << "** Running GD iteration " << k << " with maximum step: " << maxStep << " **" << endl;
 

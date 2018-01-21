@@ -259,7 +259,7 @@ int main(int argn, char ** args) {
 		Plan.set_environment(2);
 	}
 
-	int mode = 2;
+	int mode = 3;
 	switch (mode) {
 	case 1: {
 		StateValidityChecker svc(1);
@@ -304,10 +304,10 @@ int main(int argn, char ** args) {
 		ofstream APS;
 		APS.open("./matlab/Benchmark_" + plannerName + "_PCS_rB.txt", ios::app);
 
-		int N = 20;
+		int N = 2;
 		for (int k = 0; k < N; k++) {
-			for (int j = 0; j < 6; j++) {
-				double maxStep = 0.2 + 0.4*j;
+			for (int j = 0; j < 3; j++) {
+				double maxStep = 0.2 + 0.2*j;
 
 				cout << "** Running PCS iteration " << k << " with maximum step: " << maxStep << " **" << endl;
 

@@ -248,15 +248,15 @@ int main(int argn, char ** args) {
 
 	State c_start, c_goal;
 	if (env == 1) {
-		c_start = {-0.59, 1.48, -1.57, -1.36, -0.4, 0, 1.0144, 0.504505, -0.149664, 1.6056, -1.17541, 0.157832};
-		c_goal = {0.56, 0.83, -0.55, -1.36, 0.5, 0, -0.786965, 0.642824, 0.316891, 2.37455, 1.48212, -1.18054};
+		c_start = {-0.03, 0.33, -0.05, 0, 1.2908, -1.5808, 0.0183141, 1.06015, -1.25727, -0.193255, 0.200755, 0.189466};
+		c_goal = {1.57, 0.55, 0.73, 0, 0.2908, 0.0092, -1.12171, 0.868895, -0.0134552, -1.21367, -1.2759, 0.661756};
 		Plan.set_environment(1);
 	}
 	else if (env == 2) {
 		Plan.set_environment(2);
 	}
 
-	int mode = 1;
+	int mode = 2;
 	switch (mode) {
 	case 1: {
 		Plan.plan(c_start, c_goal, runtime, ptype, 0.6);
@@ -266,10 +266,10 @@ int main(int argn, char ** args) {
 	case 2 : { // Benchmark planning time with constant maximum step size
 
 		ofstream APS;
-		APS.open("./matlab/Benchmark_" + plannerName + "_PCS.txt", ios::app);
+		APS.open("./matlab/Benchmark_" + plannerName + "_SG.txt", ios::app);
 		
 		for (int k = 0; k < 100; k++) {
-			Plan.plan(c_start, c_goal, runtime, ptype, 0.8); // CBiRRT
+			Plan.plan(c_start, c_goal, runtime, ptype, 0.4); // CBiRRT
 			//Plan.plan(c_start, c_goal, runtime, ptype, 0.4); // SBL
 
 			// Extract from perf file
@@ -287,12 +287,12 @@ int main(int argn, char ** args) {
 	case 3 : { // Benchmark maximum step size while benchmarking the step size
 		ofstream APS;
 		if (env == 1)
-			APS.open("./matlab/Benchmark_" + plannerName + "_SG_3poles_rB.txt", ios::app);
+			APS.open("./matlab/Benchmark_" + plannerName + "_SG_rB.txt", ios::app);
 
-		int N = 100;
+		int N = 10;
 		for (int k = 0; k < N; k++) {
-			for (int j = 0; j < 2; j++) {
-				double maxStep = 1 + 0.4*j;
+			for (int j = 0; j < 4; j++) {
+				double maxStep = 0.2 + 0.2*j;
 
 				cout << "** Running RSS iteration " << k << " with maximum step: " << maxStep << " **" << endl;
 
