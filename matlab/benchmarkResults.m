@@ -5,7 +5,7 @@ clc
 d = 0.2;
 %%
 planners = {'BiRRT','RRT','SBL'};
-plannerType = planners{2};
+plannerType = planners{1};
 switch plannerType
     case 'BiRRT'
         D{1} = load('Benchmark_BiRRT_PCS.txt'); 
